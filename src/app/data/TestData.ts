@@ -52,11 +52,15 @@ export class TestData {
             id: 4,
             title: "Марафон",
             completed: false,
+            priority: TestData.priorities[1],
+            category: TestData.categories[5],
             date:new Date('2020-18-1')
         },
         {
             id: 5,
             title: "Собрать документы",
+            priority: TestData.priorities[1],
+            category: TestData.categories[6],
             completed: true,
         }
 
