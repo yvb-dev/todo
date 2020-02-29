@@ -30,7 +30,7 @@ export class TestData {
             completed: false,
             priority: TestData.priorities[0],
             category: TestData.categories[0],
-            date: new Date('2020-18-2')
+            date: new Date('2020-2-18')
         },
         {
             id: 2,
@@ -38,7 +38,7 @@ export class TestData {
             completed: false,
             priority: TestData.priorities[2],
             category: TestData.categories[6],
-            date: new Date('2020-18-2')
+            date: new Date('2020-2-18')
         },
         {
             id: 3,
@@ -46,22 +46,19 @@ export class TestData {
             completed: false,
             priority: TestData.priorities[1],
             category: TestData.categories[2],
-            date: new Date('2020-15-2')
+            date: new Date('2020-2-15')
         },
         {
             id: 4,
             title: "Марафон",
-            completed: false,
-            priority: TestData.priorities[1],
+            completed: true,
             category: TestData.categories[5],
-            date:new Date('2020-18-1')
+            date:new Date('2020-1-18')
         },
         {
             id: 5,
             title: "Собрать документы",
-            priority: TestData.priorities[1],
-            category: TestData.categories[6],
-            completed: true,
+            completed: false,
         }
 
     ]
