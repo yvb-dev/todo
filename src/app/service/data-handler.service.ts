@@ -11,7 +11,7 @@ import {TasksComponent} from "../views/tasks/tasks.component";
 })
 export class DataHandlerService {
 
-    taskObservable = new BehaviorSubject<Task[]>(TestData.tasks);
+    tasksSubject = new BehaviorSubject<Task[]>(TestData.tasks);
     categoryObservable = new BehaviorSubject<Category[]>(TestData.categories);
 
 
@@ -23,11 +23,11 @@ export class DataHandlerService {
     // }
 
     fillTask() {
-        this.taskObservable.next(TestData.tasks);
+        this.tasksSubject.next(TestData.tasks);
     }
 
     fillTaskByCategory(category: Category) {
         const tasks = TestData.tasks.filter(task => task.category === category);
-        this.taskObservable.next(tasks)
+        this.tasksSubject.next(tasks)
     }
 }
