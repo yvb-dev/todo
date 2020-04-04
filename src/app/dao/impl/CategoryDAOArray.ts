@@ -1,9 +1,14 @@
 import {CategoryDAO} from "../interface/CategoryDAO";
 import {Category} from "../../model/Category";
-import {Observable} from "rxjs";
+import {Observable, of} from "rxjs";
+import {Task} from "../../model/Task";
+import {TestData} from "../../data/TestData";
 
-export class CategoryDAOArray implements CategoryDAO{
-    getAll: Observable<Category[]>;
+export class CategoryDAOArray implements CategoryDAO {
+
+    getAll(): Observable<Category[]> {
+        return of(TestData.categories);
+    };
 
     add(T): Observable<Category> {
         return undefined;

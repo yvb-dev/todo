@@ -3,7 +3,9 @@ import {Observable} from "rxjs";
 import {Priority} from "../../model/Priority";
 
 export class PriorityDAOArray implements PriorityDAO{
-    getAll: Observable<Priority[]>;
+    getAll(): Observable<Priority[]>{
+        return undefined;
+    };
 
     add(T): Observable<Priority> {
         return undefined;

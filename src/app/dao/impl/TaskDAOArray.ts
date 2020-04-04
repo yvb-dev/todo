@@ -1,11 +1,15 @@
 import {TaskDAO} from "../interface/TaskDAO";
-import {Observable} from "rxjs";
+import {Observable, of} from "rxjs";
 import {Category} from "../../model/Category";
 import {Priority} from "../../model/Priority";
 import {Task} from "../../model/Task";
+import {TestData} from "../../data/TestData";
 
 export class TaskDAOArray implements TaskDAO{
-    getAll: Observable<Task[]>;
+
+    getAll(): Observable<Task[]> {
+        return of(TestData.tasks);
+    }
 
     add(T): Observable<Task> {
         return undefined;

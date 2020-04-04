@@ -10,10 +10,10 @@
     <div class="sidebar-wrapper">
         <ul class="nav">
             <li
-                    *ngFor="let category of categories"
-                    (click)="showTasksByCategory(category)"
-                    class="nav-item pointer"
-                    [class.active]="activeCategory === category">
+                    *ngFor="let category of categories">
+<!--                    (click)="showTasksByCategory(category)"-->
+<!--                    class="nav-item pointer"-->
+<!--                    [class.active]="activeCategory === category">-->
                 <!--                OR-->
                 <!--    class = "{{category === activeCategory ? 'active' : ''}}"-->
                 <a class="nav-link">
