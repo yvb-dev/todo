@@ -1,4 +1,8 @@
 import {Component} from '@angular/core';
+import {Task} from "./model/Task";
+import {MatTableDataSource} from "@angular/material/table";
+import {DataHandlerService} from "./service/data-handler.service";
+import {Category} from "./model/Category";
 
 @Component({
     selector: 'app-root',
@@ -7,4 +11,14 @@ import {Component} from '@angular/core';
 })
 export class AppComponent {
     title = 'Todo';
+    tasks: Task[];
+    categories: Category[];
+
+    constructor(private dataHandler: DataHandlerService) {
+    }
+
+    ngOnInit() {
+        this.dataHandler.getAllTasks().subscribe(tasks => this.tasks = tasks);
+        this.dataHandler.getAllCategories().subscribe(categories => this.categories = categories );
+    }
 }

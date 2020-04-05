@@ -1,4 +1,4 @@
-import {AfterContentInit, AfterViewInit, Component, OnInit, ViewChild, ViewChildren} from '@angular/core';
+import {AfterContentInit, AfterViewInit, Component, Input, OnInit, ViewChild, ViewChildren} from '@angular/core';
 import {DataHandlerService} from "../../service/data-handler.service";
 import {Task} from 'src/app/model/Task';
 import {MatTableDataSource} from "@angular/material/table";
@@ -10,8 +10,9 @@ import {MatSort} from "@angular/material/sort";
     templateUrl: './tasks.component.html',
     styleUrls: ['./tasks.component.css']
 })
-export class TasksComponent implements OnInit, AfterViewInit {
+export class TasksComponent implements OnInit {
 
+    @Input()
     tasks: Task[];
 
     // поля для таблицы (те, что отображают данные из задачи - должны совпадать с названиями переменных класса)
@@ -28,18 +29,17 @@ export class TasksComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
-        // this.dataHandler.tasksSubject.subscribe(tasks => this.tasks = tasks);
-        this.dataHandler.getAllTasks().subscribe(tasks => this.tasks = tasks);
+        // this.dataHandler.getAllTasks().subscribe(tasks => this.tasks = tasks);
 
         // датасорс обязательно нужно создавать для таблицы, в него присваивается любой источник (БД, массивы, JSON и пр.)
         this.dataSource = new MatTableDataSource();
 
-        this.refreshTable();
+        this.fillTable();
     }
 
-    ngAfterViewInit(): void {
-        this.addTableObject();
-    }
+    // ngAfterViewInit(): void {
+    //     this.addTableObject();
+    // }
 
     toggleTaskCompleted(task: Task) {
         task.completed = !task.completed
@@ -61,7 +61,7 @@ export class TasksComponent implements OnInit, AfterViewInit {
     }
 
     // показывает задачи с применением всех текущий условий (категория, поиск, фильтры и пр.)
-    private refreshTable() {
+    private fillTable() {
         this.dataSource.data = this.tasks; // обновить источник данных (т.к. данные массива tasks обновились)
         this.addTableObject();
 
