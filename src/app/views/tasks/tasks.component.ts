@@ -1,4 +1,13 @@
-import {AfterContentInit, AfterViewInit, Component, Input, OnInit, ViewChild, ViewChildren} from '@angular/core';
+import {
+    AfterContentInit,
+    AfterViewInit,
+    Component,
+    EventEmitter,
+    Input,
+    OnInit, Output,
+    ViewChild,
+    ViewChildren
+} from '@angular/core';
 import {DataHandlerService} from "../../service/data-handler.service";
 import {Task} from 'src/app/model/Task';
 import {MatTableDataSource} from "@angular/material/table";
@@ -11,9 +20,6 @@ import {MatSort} from "@angular/material/sort";
     styleUrls: ['./tasks.component.css']
 })
 export class TasksComponent implements OnInit {
-
-    @Input()
-    tasks: Task[];
 
     // поля для таблицы (те, что отображают данные из задачи - должны совпадать с названиями переменных класса)
     private displayedColumns: string[] = ['color', 'id', 'title', 'date', 'priority', 'category'];
@@ -28,18 +34,25 @@ export class TasksComponent implements OnInit {
     constructor(private dataHandler: DataHandlerService) {
     }
 
+    private tasks: Task[];
+
+    @Input("tasks")
+    private set setTasks(tasks: Task[]) {
+        this.tasks = tasks;
+        this.fillTable()
+    }
+
+    @Output()
+    private selectTask = new EventEmitter();
+    selectedTask: Task;
+
     ngOnInit() {
-        // this.dataHandler.getAllTasks().subscribe(tasks => this.tasks = tasks);
 
         // датасорс обязательно нужно создавать для таблицы, в него присваивается любой источник (БД, массивы, JSON и пр.)
         this.dataSource = new MatTableDataSource();
 
         this.fillTable();
     }
-
-    // ngAfterViewInit(): void {
-    //     this.addTableObject();
-    // }
 
     toggleTaskCompleted(task: Task) {
         task.completed = !task.completed
@@ -62,6 +75,10 @@ export class TasksComponent implements OnInit {
 
     // показывает задачи с применением всех текущий условий (категория, поиск, фильтры и пр.)
     private fillTable() {
+        if (!this.dataSource) {
+            return;
+        }
+
         this.dataSource.data = this.tasks; // обновить источник данных (т.к. данные массива tasks обновились)
         this.addTableObject();
 
@@ -90,5 +107,13 @@ export class TasksComponent implements OnInit {
     private addTableObject(): void {
         this.dataSource.sort = this.sort;
         this.dataSource.paginator = this.paginator;
+    }
+
+    private writeConsoleTask(task: Task) {
+        if (this.selectedTask === task) {
+            return
+        }
+        this.selectedTask = task;
+        this.selectTask.emit(this.selectedTask);
     }
 }

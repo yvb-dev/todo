@@ -8,6 +8,7 @@ import {TasksComponent} from "../views/tasks/tasks.component";
 import {TaskDAO} from "../dao/interface/TaskDAO";
 import {TaskDAOArray} from "../dao/impl/TaskDAOArray";
 import {CategoryDAOArray} from "../dao/impl/CategoryDAOArray";
+import {Priority} from "../model/Priority";
 
 @Injectable({
     providedIn: 'root'
@@ -24,12 +25,16 @@ export class DataHandlerService {
         return this.taskDAO.getAll();
     }
 
-    getAllCategories(): Observable<Category[]>{
+    getTaskById(id: number): Observable<Task>{
+        return this.taskDAO.get(id)
+    }
+
+    getAllCategories(): Observable<Category[]> {
         return this.categoryDAO.getAll();
     }
 
-    // fillTaskByCategory(category: Category) {
-    //     const tasks = TestData.tasks.filter(task => task.category === category);
-    //     this.tasksSubject.next(tasks)
-    // }
+    searchTasks(category: Category, searchText: string, status: boolean, priority: Priority): Observable<Task[]> {
+        return this.taskDAO.search(category, searchText, status, priority);
+    }
+
 }

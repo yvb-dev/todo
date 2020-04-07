@@ -9,13 +9,12 @@
     </a></div>
     <div class="sidebar-wrapper">
         <ul class="nav">
-            <li
-                    *ngFor="let category of categories">
-<!--                    (click)="showTasksByCategory(category)"-->
-<!--                    class="nav-item pointer"-->
-<!--                    [class.active]="activeCategory === category">-->
-                <!--                OR-->
-                <!--    class = "{{category === activeCategory ? 'active' : ''}}"-->
+            <li (click)="showTasksByCategory(category)"
+                *ngFor="let category of categories" [class.active]="category === selectedCategory"
+
+                class="nav-item pointer"
+
+            >
                 <a class="nav-link">
                     <i class="material-icons">dashboard</i>
                     <p>{{category.title}}</p>
