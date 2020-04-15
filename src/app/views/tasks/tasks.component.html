@@ -30,7 +30,7 @@
             <!-- название задачи-->
             <ng-container matColumnDef="title">
                 <th *matHeaderCellDef mat-header-cell mat-sort-header> Название</th>
-                <td (click)="writeConsoleTask(task)" class="col-title" *matCellDef="let task" [class.completed]="task.completed" mat-cell>
+                <td (click)="openEditTaskDialog(task)" class="col-title" *matCellDef="let task" [class.completed]="task.completed" mat-cell>
 
                     {{task.title}}
 
@@ -66,7 +66,7 @@
             <!--категория-->
             <ng-container matColumnDef="category">
                 <th *matHeaderCellDef mat-header-cell mat-sort-header> Категория</th>
-                <td class="col-category" mat-sort-header="category" *matCellDef="let task"
+                <td class="col-category"  *matCellDef="let task"
                     [ngClass]="{'completed': task.completed, 'novalue': task.category == null, 'link': !task.completed && task.category}"
                     mat-cell
                 >
