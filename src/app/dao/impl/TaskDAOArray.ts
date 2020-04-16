@@ -52,7 +52,9 @@ export class TaskDAOArray implements TaskDAO {
         return allTasks;
     }
 
-    update(T): Observable<Task> {
-        return undefined;
+    update(task: Task): Observable<Task> {
+        const tmpTask = TestData.tasks.find(value => value.id == task.id);
+        TestData.tasks.splice(TestData.tasks.indexOf(tmpTask), 1, task);
+        return of(task);
     }
 }

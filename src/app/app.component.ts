@@ -26,10 +26,23 @@ export class AppComponent {
     private onSelectCategory(category: Category) {
         this.selectedCategory = category;
         this.dataHandler.searchTasks(this.selectedCategory, null, null, null)
-            .subscribe(tasks => {this.tasks = tasks});
+            .subscribe(tasks => {
+                this.tasks = tasks
+            });
     }
 
-    private writeConsoleTask(task: Task){
+    private onUpdateTask(task: Task) {
+        this.dataHandler.updateTask(task).subscribe(() => {
+            this.dataHandler.searchTasks(
+                this.selectedCategory,
+                null,
+                null,
+                null
+            ).subscribe(value => this.tasks = value)
+        })
+    }
+
+    private writeConsoleTask(task: Task) {
         console.log(task);
     }
 }

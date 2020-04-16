@@ -44,8 +44,9 @@ export class TasksComponent implements OnInit {
     }
 
     @Output()
-    private selectTask = new EventEmitter();
-    selectedTask: Task;
+    private updateTask = new EventEmitter();
+    // private selectTask = new EventEmitter();
+    // selectedTask: Task;
 
     ngOnInit() {
 
@@ -119,13 +120,10 @@ export class TasksComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(value => {
             //handling result
-
+            if (value as Task) {
+                this.updateTask.emit(task);
+                return;
+            }
         })
-
-        if (this.selectedTask === task) {
-            return
-        }
-        this.selectedTask = task;
-        this.selectTask.emit(this.selectedTask);
     }
 }

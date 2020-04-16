@@ -25,7 +25,7 @@ export class DataHandlerService {
         return this.taskDAO.getAll();
     }
 
-    getTaskById(id: number): Observable<Task>{
+    getTaskById(id: number): Observable<Task> {
         return this.taskDAO.get(id)
     }
 
@@ -35,6 +35,10 @@ export class DataHandlerService {
 
     searchTasks(category: Category, searchText: string, status: boolean, priority: Priority): Observable<Task[]> {
         return this.taskDAO.search(category, searchText, status, priority);
+    }
+
+    updateTask(task: Task): Observable<Task> {
+        return this.taskDAO.update(task);
     }
 
 }
