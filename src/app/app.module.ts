@@ -13,6 +13,8 @@ import {FormsModule} from "@angular/forms";
 import {MatInputModule} from "@angular/material/input";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
+import {MatSelectModule} from "@angular/material/select";
+import {MatOptionModule} from "@angular/material/core";
 // import {MatTableModule} from "@angular/material/table";
 // import {MatSortModule} from "@angular/material/sort";
 // import {MatPaginatorModule} from "@angular/material/paginator";
@@ -35,7 +37,9 @@ import {MatIconModule} from "@angular/material/icon";
         FormsModule,
         MatInputModule,
         MatButtonModule,
-        MatIconModule
+        MatIconModule,
+        MatOptionModule,
+        MatSelectModule
     ],
     providers: [],
     entryComponents: [

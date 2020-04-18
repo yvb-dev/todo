@@ -42,7 +42,7 @@ export class AppComponent {
         })
     }
 
-    private writeConsoleTask(task: Task) {
-        console.log(task);
-    }
+    // private writeConsoleTask(task: Task) {
+    //     console.log(task);
+    // }
 }

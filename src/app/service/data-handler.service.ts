@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
-import {Category} from "../model/Category";
 import {TestData} from "../data/TestData";
+import {Category} from "../model/Category";
 import {Task} from "../model/Task";
 import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {toASCII} from "punycode";
@@ -9,6 +9,7 @@ import {TaskDAO} from "../dao/interface/TaskDAO";
 import {TaskDAOArray} from "../dao/impl/TaskDAOArray";
 import {CategoryDAOArray} from "../dao/impl/CategoryDAOArray";
 import {Priority} from "../model/Priority";
+import {PriorityDAOArray} from "../dao/impl/PriorityDAOArray";
 
 @Injectable({
     providedIn: 'root'
@@ -17,6 +18,7 @@ export class DataHandlerService {
 
     private taskDAO = new TaskDAOArray();
     private categoryDAO = new CategoryDAOArray();
+    private priorityDAO = new PriorityDAOArray();
 
     constructor() {
     }
@@ -31,6 +33,10 @@ export class DataHandlerService {
 
     getAllCategories(): Observable<Category[]> {
         return this.categoryDAO.getAll();
+    }
+
+    getAllPriorities(): Observable<Priority[]>{
+        return this.priorityDAO.getAll();
     }
 
     searchTasks(category: Category, searchText: string, status: boolean, priority: Priority): Observable<Task[]> {
