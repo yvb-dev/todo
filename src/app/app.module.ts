@@ -21,6 +21,12 @@ import {MatDatepickerModule} from "@angular/material/datepicker";
 // import {MatSortModule} from "@angular/material/sort";
 // import {MatPaginatorModule} from "@angular/material/paginator";
 
+import {TaskDatePipe} from "./pipe/task-date.pipe";
+import {registerLocaleData} from "@angular/common";
+import localeRu from "@angular/common/locales/ru";
+
+registerLocaleData(localeRu);
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -28,6 +34,7 @@ import {MatDatepickerModule} from "@angular/material/datepicker";
         TasksComponent,
         EditTaskDialogComponent,
         ConfirmDialogComponent,
+        TaskDatePipe,
     ],
     imports: [
         BrowserModule,
