@@ -47,4 +47,7 @@ export class DataHandlerService {
         return this.taskDAO.update(task);
     }
 
+    deleteTask(id: number) {
+        return this.taskDAO.delete(id);
+    }
 }

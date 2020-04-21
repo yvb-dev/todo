@@ -29,6 +29,7 @@ export class TasksComponent implements OnInit {
     @ViewChild(MatSort, {static: false})
     private sort: MatSort
 
+
     constructor(
         private dataHandler: DataHandlerService,
         private dialog: MatDialog,
@@ -42,6 +43,9 @@ export class TasksComponent implements OnInit {
         this.tasks = tasks;
         this.fillTable()
     }
+
+    @Output()
+    private deleteTask = new EventEmitter();
 
     @Output()
     private updateTask = new EventEmitter();
@@ -120,6 +124,12 @@ export class TasksComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(value => {
             //handling result
+
+            if (value === 'delete') {
+                this.deleteTask.emit(task);
+                return;
+            }
+
             if (value as Task) {
                 this.updateTask.emit(task);
                 return;

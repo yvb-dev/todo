@@ -45,4 +45,15 @@ export class AppComponent {
     // private writeConsoleTask(task: Task) {
     //     console.log(task);
     // }
+    onDeleteTask(task: Task) {
+        this.dataHandler.deleteTask(task.id).subscribe(() => {
+            this.dataHandler.searchTasks(
+                this.selectedCategory,
+                null,
+                null,
+                null
+            ).subscribe(value => this.tasks = value)
+        })
+        
+    }
 }
