@@ -11,6 +11,8 @@ import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {MatDialog} from "@angular/material/dialog";
 import {EditTaskDialogComponent} from "../../dialog/edit-task-dialog/edit-task-dialog.component";
+import {ConfirmDialogComponent} from "../../dialog/confirm-dialog/confirm-dialog.component";
+import {Category} from "../../model/Category";
 
 @Component({
     selector: 'app-tasks',
@@ -20,7 +22,7 @@ import {EditTaskDialogComponent} from "../../dialog/edit-task-dialog/edit-task-d
 export class TasksComponent implements OnInit {
 
     // поля для таблицы (те, что отображают данные из задачи - должны совпадать с названиями переменных класса)
-    private displayedColumns: string[] = ['color', 'id', 'title', 'date', 'priority', 'category'];
+    private displayedColumns: string[] = ['color', 'id', 'title', 'date', 'priority', 'category', 'operations', 'select'];
     private dataSource: MatTableDataSource<Task>; // контейнер - источник данных для таблицы
 
     // ссылки на компоненты таблицы
@@ -28,13 +30,12 @@ export class TasksComponent implements OnInit {
     private paginator: MatPaginator
     @ViewChild(MatSort, {static: false})
     private sort: MatSort
-
-
     constructor(
         private dataHandler: DataHandlerService,
         private dialog: MatDialog,
     ) {
     }
+
 
     private tasks: Task[];
 
@@ -43,6 +44,9 @@ export class TasksComponent implements OnInit {
         this.tasks = tasks;
         this.fillTable()
     }
+
+    @Output()
+    private selectCategory = new EventEmitter();
 
     @Output()
     private deleteTask = new EventEmitter();
@@ -135,5 +139,32 @@ export class TasksComponent implements OnInit {
                 return;
             }
         })
+    }
+
+    openDeleteDialog(task: Task) {
+
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            maxWidth: '500px',
+            data: {
+                dialogTitle: `Подтвердите действие`,
+                message: `Вы действительно хотитет удалить задачу: "${task.title}"?`
+            },
+            autoFocus: false
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                this.deleteTask.emit(task);
+            }
+        });
+    }
+
+    onToggleStatus(task: Task) {
+        task.completed = !task.completed;
+        this.updateTask.emit(task);
+    }
+
+    onSelectCategory(category: Category) {
+        this.selectCategory.emit(category);
     }
 }

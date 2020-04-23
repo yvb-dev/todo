@@ -43,7 +43,8 @@
                 <th *matHeaderCellDef mat-header-cell mat-sort-header> Срок</th>
                 <td class="col-date" *matCellDef="let task"
                     [ngClass]="{'completed': task.completed, 'novalue': task.date == null}"
-                    mat-cell>
+                    mat-cell
+                >
 
                     {{task.date | taskDate }}
 
@@ -53,9 +54,10 @@
             <!--приоритет-->
             <ng-container matColumnDef="priority">
                 <th *matHeaderCellDef mat-header-cell mat-sort-header> Приоритет</th>
-                <td class="col-priority" *matCellDef="let task"
-                    [ngClass]="{'completed': task.completed, 'novalue': task.priority == null}"
-                    mat-cell
+                <td
+                        class="col-priority" *matCellDef="let task"
+                        [ngClass]="{'completed': task.completed, 'novalue': task.priority == null}"
+                        mat-cell
                 >
 
                     {{task.priority ? task.priority.title : "Без приоритета"}}
@@ -67,13 +69,47 @@
             <!--категория-->
             <ng-container matColumnDef="category">
                 <th *matHeaderCellDef mat-header-cell mat-sort-header> Категория</th>
-                <td class="col-category" *matCellDef="let task"
-                    [ngClass]="{'completed': task.completed, 'novalue': task.category == null, 'link': !task.completed && task.category}"
-                    mat-cell
+                <td
+                        (click)="!task.completed && task.category != null && onSelectCategory(task.category)"
+                        class="col-category" *matCellDef="let task"
+                        [ngClass]="{'completed': task.completed, 'novalue': task.category == null, 'link': !task.completed && task.category}"
+                        mat-cell
                 >
 
                     {{task.category ? task.category.title : "Без категории"}}
 
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="operations">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td class="col-operations" mat-cell *matCellDef="let task" [class.completed]="task.completed">
+
+                    <button mat-icon-button (click)="openDeleteDialog(task)"
+                            class="delete-icon">
+                        <mat-icon aria-hidden="false">delete</mat-icon>
+                    </button>
+
+                    <button mat-icon-button (click)="openEditTaskDialog(task)"
+                            class="edit-icon">
+                        <mat-icon aria-hidden="false">edit</mat-icon>
+                    </button>
+
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td class="col-select text-right" mat-cell *matCellDef="let task">
+                    <mat-checkbox
+
+                            (click)="$event.stopImmediatePropagation()"
+
+                            (change)="$event ? onToggleStatus(task) : null"
+
+                            [checked]="task.completed"
+                    >
+                    </mat-checkbox>
                 </td>
             </ng-container>
 

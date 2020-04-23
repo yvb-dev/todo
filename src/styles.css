@@ -25,3 +25,8 @@
 .red {
     color: red;
 }
+
+.link{
+    cursor: pointer;
+    text-decoration: underline;
+}
