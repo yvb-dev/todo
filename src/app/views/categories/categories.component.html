@@ -9,6 +9,7 @@
     </a></div>
     <div class="sidebar-wrapper">
         <ul class="nav">
+            <!--            Категория Все-->
             <li
                     (click)="showTasksByCategory(null)"
                     [class.active]="selectedCategory === null"
@@ -18,16 +19,32 @@
                     <span class="all-category-title">Все</span>
                 </a>
             </li>
+            <!--            Разделитель-->
             <div class="line"></div>
-            <li (click)="showTasksByCategory(category)"
-                *ngFor="let category of categories" [class.active]="category === selectedCategory"
+            <!--            Категории из списка-->
+            <li
+                    *ngFor="let category of categories; let index = index"
+                    [class.active]="category === selectedCategory"
+                    (click)="showTasksByCategory(category)"
 
-                class="nav-item pointer"
+                    (mouseleave)="showEditIcon(null)"
+                    (mouseenter)="showEditIcon(index)"
+
+                    class="nav-item pointer"
 
             >
                 <a class="nav-link">
-                    <i class="material-icons">dashboard</i>
-                    <p>{{category.title}}</p>
+                    <!--                    Название категории-->
+                    <span class="category-title">{{category.title}}</span>
+                    <!--                    Кнопка редактирования категории-->
+                    <span class="edit-category-icon-area">
+                    <mat-icon
+                            class="edit-category-icon"
+                            *ngIf="indexMouseMove === index"
+                            (click)="$event.stopPropagation(); openEditDialog(category)"
+                    >edit
+                    </mat-icon>
+                    </span>
                 </a>
             </li
             >

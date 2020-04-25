@@ -64,7 +64,7 @@ export class EditTaskDialogComponent implements OnInit {
             maxWidth: '500px',
             data: {
                 dialogTitle: `Подтвердите действие`,
-                message: `Вы действительно хотитет удалить задачу: "${this.task.title}"?`
+                message: `Вы действительно хотите удалить задачу: "${this.task.title}"?`
             },
             autoFocus: false
         });

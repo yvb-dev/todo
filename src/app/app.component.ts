@@ -54,6 +54,19 @@ export class AppComponent {
                 null
             ).subscribe(value => this.tasks = value)
         })
-        
+
+    }
+
+    onDeleteCategory(category: Category) {
+        this.dataHandler.deleteCategory(category.id).subscribe(value => {
+            this.selectedCategory = null;
+            this.onSelectCategory(this.selectedCategory)
+        });
+    }
+
+    onUpdateCategory(category: Category) {
+        this.dataHandler.updateCategory(category).subscribe(value => {
+            this.onSelectCategory(this.selectedCategory);
+        });
     }
 }

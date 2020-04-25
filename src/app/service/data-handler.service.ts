@@ -35,7 +35,7 @@ export class DataHandlerService {
         return this.categoryDAO.getAll();
     }
 
-    getAllPriorities(): Observable<Priority[]>{
+    getAllPriorities(): Observable<Priority[]> {
         return this.priorityDAO.getAll();
     }
 
@@ -47,7 +47,15 @@ export class DataHandlerService {
         return this.taskDAO.update(task);
     }
 
-    deleteTask(id: number) {
+    deleteTask(id: number): Observable<Task> {
         return this.taskDAO.delete(id);
+    }
+
+    updateCategory(category: Category): Observable<Category> {
+        return this.categoryDAO.update(category);
+    }
+
+    deleteCategory(id: number): Observable<Category> {
+        return this.categoryDAO.delete(id);
     }
 }
