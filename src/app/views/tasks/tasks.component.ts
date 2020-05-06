@@ -13,6 +13,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {EditTaskDialogComponent} from "../../dialog/edit-task-dialog/edit-task-dialog.component";
 import {ConfirmDialogComponent} from "../../dialog/confirm-dialog/confirm-dialog.component";
 import {Category} from "../../model/Category";
+import {Priority} from "../../model/Priority";
 
 @Component({
     selector: 'app-tasks',
@@ -30,20 +31,37 @@ export class TasksComponent implements OnInit {
     private paginator: MatPaginator
     @ViewChild(MatSort, {static: false})
     private sort: MatSort
+    private searchTaskText: string = '';
+    private selectedStatusFilter: boolean = null;
+
     constructor(
         private dataHandler: DataHandlerService,
         private dialog: MatDialog,
     ) {
     }
 
-
     private tasks: Task[];
-
     @Input("tasks")
     private set setTasks(tasks: Task[]) {
         this.tasks = tasks;
         this.fillTable()
     }
+
+    private priorities: Priority[];
+    @Input("priorities")
+    private set setPriorities(priorities: Priority[]) {
+        this.priorities = priorities;
+
+    }
+
+    @Output()
+    private filterByPriority = new EventEmitter<Priority>();
+
+    @Output()
+    private filterByStatus = new EventEmitter<boolean>();
+
+    @Output()
+    private filterByTitle = new EventEmitter();
 
     @Output()
     private selectCategory = new EventEmitter();
@@ -166,5 +184,32 @@ export class TasksComponent implements OnInit {
 
     onSelectCategory(category: Category) {
         this.selectCategory.emit(category);
+    }
+
+//фильтрация по названию
+    private onFilterByTitle() {
+        this.filterByTitle.emit(this.searchTaskText)
+    }
+
+
+    // фильтрация по статусу
+    selectedPriorityFilter: any;
+    private onFilterByStatus(value: boolean) {
+
+        // на всякий случай проверяем изменилось ли значение (хотя сам UI компонент должен это делать)
+        if (value !== this.selectedStatusFilter) {
+            this.selectedStatusFilter = value;
+            this.filterByStatus.emit(this.selectedStatusFilter);
+        }
+    }
+
+    // фильтрация по приоритету
+    private onFilterByPriority(value: Priority) {
+
+        // на всякий случай проверяем изменилось ли значение (хотя сам UI компонент должен это делать)
+        if (value !== this.selectedPriorityFilter) {
+            this.selectedPriorityFilter = value;
+            this.filterByPriority.emit(this.selectedPriorityFilter);
+        }
     }
 }

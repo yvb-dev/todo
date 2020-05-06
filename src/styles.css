@@ -8,6 +8,11 @@
     font-size: 20px;
     color: rgba(74, 74, 74, 0.98);
     text-align: center;
+
+}
+
+.pointer {
+    cursor: pointer;
 }
 
 .size25 {
@@ -26,12 +31,16 @@
     color: red;
 }
 
-.link{
-    cursor: pointer;
+.link {
     text-decoration: underline;
+    cursor: pointer;
 }
 
-.line{
+.line {
     border-bottom: 1px solid #dadada;
     padding-top: 20px;
+}
+
+.gray{
+    color: #8f8f8f;
 }

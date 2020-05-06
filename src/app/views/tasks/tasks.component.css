@@ -50,7 +50,7 @@
     margin-right: 3px;
 }
 
-.edit-icon{
+.edit-icon {
     cursor: pointer;
     color: #9A9A9A;
     font-size: 18px;
@@ -58,7 +58,7 @@
     margin-right: 3px;
 }
 
-.mat-header-cell{
+.mat-header-cell {
     font-size: 1.063rem;
     color: #9c27b0 !important;
     font-weight: normal;
