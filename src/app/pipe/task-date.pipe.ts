@@ -4,7 +4,7 @@ import {DatePipe} from "@angular/common";
 @Pipe({
     name: 'taskDate'
 })
-export class TaskDatePipe implements PipeTransform {
+export class TaskDatePipe extends DatePipe implements PipeTransform {
 
     transform(date: Date | string, format: string = 'mediumDate'): string {
 

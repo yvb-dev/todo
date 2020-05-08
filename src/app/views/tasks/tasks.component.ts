@@ -14,6 +14,7 @@ import {EditTaskDialogComponent} from "../../dialog/edit-task-dialog/edit-task-d
 import {ConfirmDialogComponent} from "../../dialog/confirm-dialog/confirm-dialog.component";
 import {Category} from "../../model/Category";
 import {Priority} from "../../model/Priority";
+import { OperType } from 'src/app/dialog/OperType';
 
 @Component({
     selector: 'app-tasks',
@@ -41,18 +42,30 @@ export class TasksComponent implements OnInit {
     }
 
     private tasks: Task[];
+
     @Input("tasks")
     private set setTasks(tasks: Task[]) {
         this.tasks = tasks;
         this.fillTable()
     }
 
+    private selectedCategory: Category;
+
+    @Input("category")
+    private set setCategory(category: Category) {
+        this.selectedCategory = category;
+    }
+
     private priorities: Priority[];
+
     @Input("priorities")
     private set setPriorities(priorities: Priority[]) {
         this.priorities = priorities;
 
     }
+
+    @Output()
+    private addTask = new EventEmitter<Task>();
 
     @Output()
     private filterByPriority = new EventEmitter<Priority>();
@@ -140,7 +153,7 @@ export class TasksComponent implements OnInit {
     private openEditTaskDialog(task: Task): void {
 
         const dialogRef = this.dialog.open(EditTaskDialogComponent, {
-            data: [task, 'Редактирование задачи'],
+            data: [task, 'Редактирование задачи', OperType.EDIT],
             autoFocus: false
         })
 
@@ -194,6 +207,7 @@ export class TasksComponent implements OnInit {
 
     // фильтрация по статусу
     selectedPriorityFilter: any;
+
     private onFilterByStatus(value: boolean) {
 
         // на всякий случай проверяем изменилось ли значение (хотя сам UI компонент должен это делать)
@@ -211,5 +225,20 @@ export class TasksComponent implements OnInit {
             this.selectedPriorityFilter = value;
             this.filterByPriority.emit(this.selectedPriorityFilter);
         }
+    }
+
+    private openAddTaskDialog() {
+        const task: Task = new Task(null, '', false, null, this.selectedCategory);
+        const dialogRef = this.dialog.open(EditTaskDialogComponent, {
+            data: [task, 'Добавить Задачу', OperType.ADD],
+            autoFocus: false
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                this.addTask.emit(task);
+                return
+            }
+        });
     }
 }

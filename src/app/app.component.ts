@@ -106,4 +106,14 @@ export class AppComponent {
         this.priorityFilter = priority;
         this.updateTasks()
     }
+
+    private onAddTask(task: Task) {
+        this.dataHandler.addTask(task).subscribe(result => {
+            this.updateTasks()
+        });
+    }
+
+    private onAddCategory(category: Category) {
+        this.dataHandler.addCategory(category).subscribe(result => this.updateTasks())
+    }
 }

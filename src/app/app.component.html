@@ -4,6 +4,8 @@
             (selectCategory)="onSelectCategory($event)"
             (deleteCategory)="onDeleteCategory($event)"
             (updateCategory)="onUpdateCategory($event)"
+            (addCategory)="onAddCategory($event)"
+
             [selectedCategory]="selectedCategory"
             [categories]="categories">
     </app-categories>
@@ -87,6 +89,8 @@
                         <app-tasks
                                 (updateTask)="onUpdateTask($event)"
                                 (deleteTask)="onDeleteTask($event)"
+                                (addTask)="onAddTask($event)"
+
                                 (selectCategory)="onSelectCategory($event)"
 
                                 (filterByStatus)="onFilterTasksByStatus($event)"
@@ -96,6 +100,7 @@
 
                                 [tasks]="tasks"
                                 [priorities]="priorities"
+                                [category]="selectedCategory"
                         >
 
                             <!--                                (selectTask)="writeConsoleTask($event)"-->

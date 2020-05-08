@@ -35,6 +35,7 @@
         Отмена
     </button>
     <button
+            *ngIf="canDelete()"
             mat-button
             class="red"
             (click)="delete()"

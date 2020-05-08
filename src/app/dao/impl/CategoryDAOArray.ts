@@ -10,14 +10,22 @@ export class CategoryDAOArray implements CategoryDAO {
         return of(TestData.categories);
     };
 
-    add(T): Observable<Category> {
-        return undefined;
+    add(category: Category): Observable<Category> {
+        if (category === null || category.id === 0) {
+            category.id = this.getLastIdCategory();
+        }
+        TestData.categories.push(category);
+        return of(category);
+    }
+
+    private getLastIdCategory() {
+        return Math.max.apply(Math, TestData.categories.map(category => category.id)) + 1;
     }
 
     delete(id: number): Observable<Category> {
 
         TestData.tasks.forEach(task => {
-            if(task.category && task.category.id === id){
+            if (task.category && task.category.id === id) {
                 task.category = null;
             }
         })
