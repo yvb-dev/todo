@@ -66,4 +66,8 @@ export class DataHandlerService {
     addCategory(category: Category): Observable<Category> {
         return this.categoryDAO.add(category);
     }
+
+    searchCategory(title: string): Observable<Category[]> {
+        return this.categoryDAO.search(title);
+    }
 }

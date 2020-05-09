@@ -84,15 +84,11 @@ export class TasksComponent implements OnInit {
 
     @Output()
     private updateTask = new EventEmitter();
-    // private selectTask = new EventEmitter();
-    // selectedTask: Task;
 
     ngOnInit() {
-
         // датасорс обязательно нужно создавать для таблицы, в него присваивается любой источник (БД, массивы, JSON и пр.)
         this.dataSource = new MatTableDataSource();
-
-        this.fillTable();
+        this.onSelectCategory(null)
     }
 
     toggleTaskCompleted(task: Task): void {

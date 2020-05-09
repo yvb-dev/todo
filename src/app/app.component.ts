@@ -19,6 +19,7 @@ export class AppComponent {
     private statusFilter: boolean;
     private priorities: Priority[];
     private priorityFilter: Priority;
+    private searchCategoryText: string = '';
 
     constructor(private dataHandler: DataHandlerService) {
     }
@@ -31,13 +32,7 @@ export class AppComponent {
 
     private onSelectCategory(category: Category) {
         this.selectedCategory = category;
-
         this.updateTasks();
-
-        // this.dataHandler.searchTasks(this.selectedCategory, null, null, null)
-        //     .subscribe(tasks => {
-        //         this.tasks = tasks
-        //     });
     }
 
     private onUpdateTask(task: Task) {
@@ -51,9 +46,6 @@ export class AppComponent {
         })
     }
 
-    // private writeConsoleTask(task: Task) {
-    //     console.log(task);
-    // }
     onDeleteTask(task: Task) {
         this.dataHandler.deleteTask(task.id).subscribe(() => {
             this.dataHandler.searchTasks(
@@ -63,19 +55,18 @@ export class AppComponent {
                 null
             ).subscribe(value => this.tasks = value)
         })
-
     }
 
     onDeleteCategory(category: Category) {
         this.dataHandler.deleteCategory(category.id).subscribe(value => {
             this.selectedCategory = null;
-            this.onSelectCategory(this.selectedCategory)
+            this.onSearchCategory(this.searchCategoryText)
         });
     }
 
     onUpdateCategory(category: Category) {
         this.dataHandler.updateCategory(category).subscribe(value => {
-            this.onSelectCategory(this.selectedCategory);
+            this.onSearchCategory(this.searchCategoryText)
         });
     }
 
@@ -115,5 +106,12 @@ export class AppComponent {
 
     private onAddCategory(category: Category) {
         this.dataHandler.addCategory(category).subscribe(result => this.updateTasks())
+    }
+
+    private onSearchCategory(title: string) {
+        this.searchCategoryText = title;
+        this.dataHandler.searchCategory(title).subscribe(categories => {
+            this.categories = categories;
+        })
     }
 }

@@ -11,6 +11,8 @@ import {OperType} from "../../dialog/OperType";
     styleUrls: ['./categories.component.css']
 })
 export class CategoriesComponent implements OnInit {
+    indexMouseMove: number;
+    searchCategoryTitle: string;
 
     @Input()
     categories: Category[];
@@ -23,15 +25,12 @@ export class CategoriesComponent implements OnInit {
     private deleteCategory = new EventEmitter<Category>();
     @Output()
     private updateCategory = new EventEmitter<Category>();
-
     @Output()
     private addCategory = new EventEmitter<Category>();
+    @Output()
+    private searchCategory = new EventEmitter();
 
-    indexMouseMove: number;
-
-    constructor(
-        private dialog: MatDialog,
-        private dataHandlerService: DataHandlerService) {
+    constructor(private dialog: MatDialog) {
     }
 
     ngOnInit() {
@@ -78,9 +77,16 @@ export class CategoriesComponent implements OnInit {
             autoFocus: false
         })
 
-        dialogRef.afterClosed().subscribe(result =>{
+        dialogRef.afterClosed().subscribe(result => {
             this.addCategory.emit(category);
             return;
-        } )
+        })
+    }
+
+    private search() {
+        if (this.searchCategoryTitle == null) {
+            return
+        }
+        this.searchCategory.emit(this.searchCategoryTitle)
     }
 }

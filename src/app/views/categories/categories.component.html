@@ -11,10 +11,38 @@
         <!--    иконка добавления новой категории -->
         <span class="add-icon-area">
 
-          <button (click)="openAddCategoryDialog()" mat-icon-button  class="add-icon">
-      <mat-icon >add</mat-icon>
+          <button (click)="openAddCategoryDialog()" mat-icon-button class="add-icon">
+      <mat-icon>add</mat-icon>
         </button>
     </span>
+
+    </div>
+
+    <div class="search-category-area">
+        <mat-form-field class="example-full-width">
+            <input
+                #inputSearchCategory
+
+                (keyup)="search()"
+                (keydown.escape)="searchCategoryTitle='';search()"
+                [(ngModel)]="searchCategoryTitle"
+
+                matInput
+                maxlength="256"
+                placeholder="Поиск категорий"
+            >
+            <button
+                    (click)="searchCategoryTitle='';search()"
+                    *ngIf="inputSearchCategory.value.length > 0" aria-label="clear"
+                    class="search-category-button size25 gray"
+                    mat-button
+                    mat-icon-button
+                    matSuffix
+            >
+                <mat-icon>clear</mat-icon>
+            </button>
+
+        </mat-form-field>
 
     </div>
     <div class="sidebar-wrapper">
@@ -32,7 +60,9 @@
             <!--            Разделитель-->
             <div class="line"></div>
             <!--            Категории из списка-->
+            <div *ngIf="categories.length == 0"><p class="not-found">Ничего не найдено</p></div>
             <li
+
                     *ngFor="let category of categories; let index = index"
                     [class.active]="category === selectedCategory"
                     (click)="showTasksByCategory(category)"
