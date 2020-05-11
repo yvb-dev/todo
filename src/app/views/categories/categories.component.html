@@ -1,93 +1,122 @@
-<div class="sidebar" data-color="purple" data-background-color="white" data-image="../assets/img/sidebar-1.jpg">
-    <!--
-      Tip 1: You can change the color of the sidebar using: data-color="purple | azure | green | orange | danger"
+<div class="sidebar" data-background-color="white" data-color="purple">
 
-      Tip 2: you can also add an image using data-image tag
-  -->
-    <div class="logo">
+    <div id="categories">
 
-        <span class="nav-title">Категории</span>
 
-        <!--    иконка добавления новой категории -->
-        <span class="add-icon-area">
+        <div class="logo">
 
-          <button (click)="openAddCategoryDialog()" mat-icon-button class="add-icon">
+            <span class="nav-title">Категории</span>
+
+            <!--    иконка добавления новой категории -->
+            <span class="add-icon-area">
+
+          <button (click)="openAddCategoryDialog()" class="add-icon" mat-icon-button>
       <mat-icon>add</mat-icon>
         </button>
     </span>
 
-    </div>
+        </div>
+        <div class="sidebar-wrapper">
+            <ul class="nav">
 
-    <div class="search-category-area">
-        <mat-form-field class="example-full-width">
-            <input
-                #inputSearchCategory
 
-                (keyup)="search()"
-                (keydown.escape)="searchCategoryTitle='';search()"
-                [(ngModel)]="searchCategoryTitle"
+                <!--      поиск категорий -->
+                <div class="search-category-area">
 
-                matInput
-                maxlength="256"
-                placeholder="Поиск категорий"
-            >
-            <button
-                    (click)="searchCategoryTitle='';search()"
-                    *ngIf="inputSearchCategory.value.length > 0" aria-label="clear"
-                    class="search-category-button size25 gray"
-                    mat-button
-                    mat-icon-button
-                    matSuffix
-            >
-                <mat-icon>clear</mat-icon>
-            </button>
+                    <mat-form-field class="example-full-width">
+                        <input
 
-        </mat-form-field>
+                            #inputSearchCategory
 
-    </div>
-    <div class="sidebar-wrapper">
-        <ul class="nav">
-            <!--            Категория Все-->
-            <li
-                    (click)="showTasksByCategory(null)"
-                    [class.active]="selectedCategory === null"
+                            (keydown.escape)="searchCategoryTitle = ''; search()"
+                            (keyup)="search()"
+                            [(ngModel)]="searchCategoryTitle"
+
+                            matInput
+                            maxlength="256"
+                            placeholder="Поиск категорий"
+
+                        />
+
+                        <button
+                                (click)="searchCategoryTitle = ''; search()"
+                                *ngIf="inputSearchCategory.value.trim().length > 0" aria-label="Clear"
+                                class="search-category-button size25 gray"
+                                mat-button
+
+                                mat-icon-button
+
+                                matSuffix
+                        >
+                            <mat-icon>clear</mat-icon>
+                        </button>
+
+                    </mat-form-field>
+
+                </div>
+
+
+                <!-- виртуальная категория 'Все'-->
+                <li (click)="showTasksByCategory(null)" [class.active]="selectedCategory === null"
                     class="nav-item category">
-                <a
-                        class="nav-link pointer">
-                    <span class="all-category-title">Все</span>
-                </a>
-            </li>
-            <!--            Разделитель-->
-            <div class="line"></div>
-            <!--            Категории из списка-->
-            <div *ngIf="categories.length == 0"><p class="not-found">Ничего не найдено</p></div>
-            <li
 
-                    *ngFor="let category of categories; let index = index"
-                    [class.active]="category === selectedCategory"
-                    (click)="showTasksByCategory(category)"
+                    <a class="nav-link pointer">
 
-                    (mouseleave)="showEditIcon(null)"
-                    (mouseenter)="showEditIcon(index)"
+                        <!--          название категории-->
+                        <span class="all-category-title">Все</span>
 
-                    class="nav-item pointer"
 
-            >
-                <a class="nav-link">
-                    <!--                    Название категории-->
-                    <span class="category-title">{{category.title}}</span>
-                    <!--                    Кнопка редактирования категории-->
-                    <span class="edit-category-icon-area">
-                    <mat-icon
-                            class="edit-category-icon"
-                            *ngIf="indexMouseMove === index"
-                            (click)="$event.stopPropagation(); openEditDialog(category)"
-                    >edit
-                    </mat-icon>
-                    </span>
-                </a>
-            </li
-            >
-        </ul>
+                    </a>
+                </li>
+
+                <!-- разделитель-->
+                <div class="line"></div>
+
+                <div *ngIf="categories.length === 0"><p class="not-found">Ничего не найдено</p></div>
+
+
+                <li
+                        (click)="showTasksByCategory(category)" (mouseenter)="showEditIcon(index)"
+
+                        *ngFor="let category of categories; let index = index "
+
+                        (mouseleave)="showEditIcon(null)"
+                        [class.active]="category === selectedCategory"
+
+
+                        class="nav-item pointer"
+
+                >
+                    <a class="nav-link">
+
+                        <!--          название категории-->
+                        <span class="category-title">{{category.title}}</span>
+
+
+                        <!--         кнопка редактирования категории-->
+                        <span class="edit-category-icon-area">
+
+            <mat-icon
+                    *ngIf="indexMouseMove === index"
+                    (click)="$event.stopPropagation(); openEditDialog(category)"
+
+                    class="edit-category-icon"
+
+
+            >edit
+            </mat-icon>
+
+
+
+          </span>
+
+
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+        <div class="sidebar-background"></div>
+
     </div>
 </div>
