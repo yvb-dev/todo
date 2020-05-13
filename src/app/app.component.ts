@@ -4,6 +4,7 @@ import {MatTableDataSource} from "@angular/material/table";
 import {DataHandlerService} from "./service/data-handler.service";
 import {Category} from "./model/Category";
 import {Priority} from "./model/Priority";
+import {zip} from "rxjs";
 
 @Component({
     selector: 'app-root',
@@ -32,28 +33,18 @@ export class AppComponent {
 
     private onSelectCategory(category: Category) {
         this.selectedCategory = category;
-        this.updateTasks();
+        this.updateTasksAndStat();
     }
 
     private onUpdateTask(task: Task) {
-        this.dataHandler.updateTask(task).subscribe(() => {
-            this.dataHandler.searchTasks(
-                this.selectedCategory,
-                null,
-                null,
-                null
-            ).subscribe(value => this.tasks = value)
+        this.dataHandler.updateTask(task).subscribe(cat => {
+            this.updateTasksAndStat()
         })
     }
 
     onDeleteTask(task: Task) {
-        this.dataHandler.deleteTask(task.id).subscribe(() => {
-            this.dataHandler.searchTasks(
-                this.selectedCategory,
-                null,
-                null,
-                null
-            ).subscribe(value => this.tasks = value)
+        this.dataHandler.deleteTask(task.id).subscribe(cat => {
+            this.updateTasksAndStat()
         })
     }
 
@@ -77,6 +68,11 @@ export class AppComponent {
     }
 
     // фильтрация задач по статусу (все, решенные, нерешенные)
+    private totalTasksCountInCategory: number;
+    private completedCountInCategory: number;
+    private uncompletedCountInCategory: number;
+    private uncompletedTotalTasksCount: number;
+
     private onFilterTasksByStatus(status: boolean) {
         this.statusFilter = status;
         this.updateTasks();
@@ -100,7 +96,7 @@ export class AppComponent {
 
     private onAddTask(task: Task) {
         this.dataHandler.addTask(task).subscribe(result => {
-            this.updateTasks()
+            this.updateTasksAndStat();
         });
     }
 
@@ -113,5 +109,25 @@ export class AppComponent {
         this.dataHandler.searchCategory(title).subscribe(categories => {
             this.categories = categories;
         })
+    }
+
+    private updateTasksAndStat() {
+        this.updateTasks();
+        this.updateStat();
+    }
+
+    // обновить статистику
+    private updateStat() {
+        zip(
+            this.dataHandler.getTotalCountInCategory(this.selectedCategory),
+            this.dataHandler.getCompletedCountInCategory(this.selectedCategory),
+            this.dataHandler.getUncompletedCountInCategory(this.selectedCategory),
+            this.dataHandler.getUncompletedTotalCount())
+            .subscribe(array => {
+                this.totalTasksCountInCategory = array[0];
+                this.completedCountInCategory = array[1];
+                this.uncompletedCountInCategory = array[2];
+                this.uncompletedTotalTasksCount = array[3]; // нужно для категории Все
+            });
     }
 }
