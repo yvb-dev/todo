@@ -13,15 +13,22 @@
 
     <div class="main-panel">
         <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
-            <app-header></app-header>
+            <app-header
+                    [categoryName]="selectedCategory ? selectedCategory.title: 'Все'"
+                    (toggleStat)="toggleStat($event)"
+                    [showStat]="showStat">
+
+            </app-header>
         </nav>
         <div class="content">
             <div class="container-fluid">
 
                 <app-stat
-                    [totalTasksInCategory]="totalTasksCountInCategory"
-                    [completeTasksInCategory]="completedCountInCategory"
-                    [uncompleteTasksInCategory]="uncompletedCountInCategory">
+                        [totalTasksInCategory]="totalTasksCountInCategory"
+                        [completeTasksInCategory]="completedCountInCategory"
+                        [uncompleteTasksInCategory]="uncompletedCountInCategory"
+                        [showStat]="showStat"
+                >
                 </app-stat>
 
                 <div class="row">

@@ -13,6 +13,9 @@ export class StatComponent implements OnInit {
   @Input()
   uncompleteTasksInCategory: number;
 
+  @Input()
+  showStat: boolean; // показать или скрыть статистику
+
   constructor() {
   }
 

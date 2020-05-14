@@ -21,6 +21,8 @@ export class AppComponent {
     private priorities: Priority[];
     private priorityFilter: Priority;
     private searchCategoryText: string = '';
+    // показать/скрыть статистику
+    private showStat = true;
 
     constructor(private dataHandler: DataHandlerService) {
     }
@@ -130,4 +132,8 @@ export class AppComponent {
                 this.uncompletedTotalTasksCount = array[3]; // нужно для категории Все
             });
     }
-}
+
+    // показать-скрыть статистику
+    private toggleStat(showStat: boolean) {
+        this.showStat = showStat;
+    }}
