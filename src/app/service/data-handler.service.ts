@@ -1,89 +1,120 @@
 import {Injectable} from '@angular/core';
-import {TestData} from "../data/TestData";
-import {Category} from "../model/Category";
-import {Task} from "../model/Task";
-import {BehaviorSubject, Observable, Subject} from "rxjs";
-import {toASCII} from "punycode";
-import {TasksComponent} from "../views/tasks/tasks.component";
-import {TaskDAO} from "../dao/interface/TaskDAO";
-import {TaskDAOArray} from "../dao/impl/TaskDAOArray";
-import {CategoryDAOArray} from "../dao/impl/CategoryDAOArray";
-import {Priority} from "../model/Priority";
-import {PriorityDAOArray} from "../dao/impl/PriorityDAOArray";
+import {Category} from '../model/Category';
+import {Priority} from '../model/Priority';
+import {Task} from '../model/Task';
+import {TaskDAOArray} from '../data/dao/impl/TaskDAOArray';
+import {CategoryDAOArray} from '../data/dao/impl/CategoryDAOArray';
+import {PriorityDAOArray} from '../data/dao/impl/PriorityDAOArray';
+import {Observable} from 'rxjs';
+
+
+// класс реализовывает методы, которые нужны frontend'у, т.е. для удобной работы представлений
+// напоминает паттер Фасад (Facade) - выдает только то, что нужно для функционала
+// сервис не реализовывает напрямую интерфейсы DAO, а использует их реализации (в данном случае массивы)
+// может использовать не все методы DAO, а только нужные
 
 @Injectable({
     providedIn: 'root'
 })
 export class DataHandlerService {
 
-    private taskDAO = new TaskDAOArray();
-    private categoryDAO = new CategoryDAOArray();
-    private priorityDAO = new PriorityDAOArray();
+    // релизации работы с данными с помощью массива
+    // (можно подставлять любые релизации, в том числе с БД. Главное - соблюдать интерфейсы)
+    private taskDaoArray = new TaskDAOArray();
+    private categoryDaoArray = new CategoryDAOArray();
+    private priorityDaoArray = new PriorityDAOArray();
+
+
 
     constructor() {
     }
 
+
+    // задачи
+
     getAllTasks(): Observable<Task[]> {
-        return this.taskDAO.getAll();
-    }
-
-    getTaskById(id: number): Observable<Task> {
-        return this.taskDAO.get(id)
-    }
-
-    getAllCategories(): Observable<Category[]> {
-        return this.categoryDAO.getAll();
-    }
-
-    getAllPriorities(): Observable<Priority[]> {
-        return this.priorityDAO.getAll();
-    }
-
-    searchTasks(category: Category, searchText: string, status: boolean, priority: Priority): Observable<Task[]> {
-        return this.taskDAO.search(category, searchText, status, priority);
-    }
-
-    updateTask(task: Task): Observable<Task> {
-        return this.taskDAO.update(task);
-    }
-
-    deleteTask(id: number): Observable<Task> {
-        return this.taskDAO.delete(id);
-    }
-
-    updateCategory(category: Category): Observable<Category> {
-        return this.categoryDAO.update(category);
-    }
-
-    deleteCategory(id: number): Observable<Category> {
-        return this.categoryDAO.delete(id);
+        return this.taskDaoArray.getAll();
     }
 
     addTask(task: Task): Observable<Task> {
-        return this.taskDAO.add(task);
+        return this.taskDaoArray.add(task);
     }
 
-    addCategory(category: Category): Observable<Category> {
-        return this.categoryDAO.add(category);
+    deleteTask(id: number): Observable<Task> {
+        return this.taskDaoArray.delete(id);
     }
 
-    searchCategory(title: string): Observable<Category[]> {
-        return this.categoryDAO.search(title);
+    updateTask(task: Task): Observable<Task> {
+        return this.taskDaoArray.update(task);
     }
 
-    getTotalCountInCategory(selectedCategory: Category): Observable<number> {
-        return this.taskDAO.getTotalCount();
+    // поиск задач по любым параметрам
+    searchTasks(category: Category, searchText: string, status: boolean, priority: Priority): Observable<Task[]> {
+        return this.taskDaoArray.search(category, searchText, status, priority);
     }
 
-    getCompletedCountInCategory(selectedCategory: Category): Observable<number> {
-        return this.taskDAO.getCompletedCountInCategory(selectedCategory);
-    }
 
-    getUncompletedCountInCategory(selectedCategory: Category): Observable<number> {
-        return this.taskDAO.getUncompletedCountInCategory(selectedCategory);
+    // статистика
+
+    getCompletedCountInCategory(category: Category): Observable<number> {
+        return this.taskDaoArray.getCompletedCountInCategory(category);
     }
 
     getUncompletedTotalCount(): Observable<number> {
-        return this.taskDAO.getUncompletedCountInCategory(null);
+        return this.taskDaoArray.getUncompletedCountInCategory(null);
+    }
+
+    getUncompletedCountInCategory(category: Category): Observable<number> {
+        return this.taskDaoArray.getUncompletedCountInCategory(category);
+    }
+
+    getTotalCountInCategory(category: Category): Observable<number> {
+        return this.taskDaoArray.getTotalCountInCategory(category);
+    }
+
+    getTotalCount(): Observable<number> {
+        return this.taskDaoArray.getTotalCount();
+    }
+
+
+    // категории
+
+    addCategory(title: string): Observable<Category> {
+        return this.categoryDaoArray.add(new Category(null, title));
+    }
+
+    getAllCategories(): Observable<Category[]> {
+        return this.categoryDaoArray.getAll();
+    }
+
+    searchCategories(title: string): Observable<Category[]> {
+        return this.categoryDaoArray.search(title);
+    }
+
+    updateCategory(category: Category): Observable<Category> {
+        return this.categoryDaoArray.update(category);
+    }
+
+    deleteCategory(id: number): Observable<Category> {
+        return this.categoryDaoArray.delete(id);
+    }
+
+
+    // приоритеты
+
+    getAllPriorities(): Observable<Priority[]> {
+        return this.priorityDaoArray.getAll();
+    }
+
+    addPriority(priority: Priority): Observable<Priority> {
+        return this.priorityDaoArray.add(priority);
+    }
+
+    deletePriority(id: number): Observable<Priority> {
+        return this.priorityDaoArray.delete(id);
+    }
+
+    updatePriority(priority: Priority): Observable<Priority> {
+        return this.priorityDaoArray.update(priority);
     }
 }

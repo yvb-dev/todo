@@ -3,39 +3,36 @@ import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
 import {ConfirmDialogComponent} from '../confirm-dialog/confirm-dialog.component';
 import {OperType} from "../OperType";
 
-
 @Component({
-    selector: 'app-edit-category-dialog',
-    templateUrl: './edit-category-dialog.component.html',
-    styleUrls: ['./edit-category-dialog.component.css']
+    selector: 'app-edit-priority-dialog',
+    templateUrl: './edit-priority-dialog.component.html',
+    styleUrls: ['./edit-priority-dialog.component.css']
 })
 
 // создание/редактирование категории
-export class EditCategoryDialogComponent implements OnInit {
+export class EditPriorityDialogComponent implements OnInit {
 
     private dialogTitle: string; // текст для диалогового окна
-    private categoryTitle: string; // текст для названия категории (при реактировании или добавлении)
-    private operType: OperType; // тип операции
+    private priorityTitle: string; // текст для названия приоритета (при реактировании или добавлении)
+    private operType: OperType;
 
     constructor(
-        private dialogRef: MatDialogRef<EditCategoryDialogComponent>, // для работы с текущим диалог. окном
+        private dialogRef: MatDialogRef<EditPriorityDialogComponent>, // // для возможности работы с текущим диалог. окном
         @Inject(MAT_DIALOG_DATA) private data: [string, string, OperType], // данные, которые передали в диалоговое окно
         private dialog: MatDialog // для открытия нового диалогового окна (из текущего) - например для подтверждения удаления
     ) {
     }
 
     ngOnInit() {
-
-        // получаем переданные в диалоговое окно данные
-        this.categoryTitle = this.data[0];
+        this.priorityTitle = this.data[0];
         this.dialogTitle = this.data[1];
-        this.operType = this.data[2]; // тип операции
+        this.operType = this.data[2];
 
     }
 
     // нажали ОК
     private onConfirm(): void {
-        this.dialogRef.close(this.categoryTitle);
+        this.dialogRef.close(this.priorityTitle);
     }
 
     // нажали отмену (ничего не сохраняем и закрываем окно)
@@ -50,7 +47,7 @@ export class EditCategoryDialogComponent implements OnInit {
             maxWidth: '500px',
             data: {
                 dialogTitle: 'Подтвердите действие',
-                message: `Вы действительно хотите удалить категорию: "${this.categoryTitle}"? (сами задачи не удаляются)`
+                message: `Вы действительно хотите удалить приоритет: "${this.priorityTitle}"? (в задачи проставится '')`
             },
             autoFocus: false
         });
@@ -64,7 +61,8 @@ export class EditCategoryDialogComponent implements OnInit {
 
     }
 
+
     private canDelete(): boolean {
-        return this.operType === OperType.EDIT;
+        return this.operType == OperType.EDIT;
     }
 }

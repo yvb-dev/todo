@@ -1,4 +1,4 @@
-export  class Priority {
+export class Priority {
     id: number;
     title: string;
     color: string;
@@ -8,4 +8,6 @@ export  class Priority {
         this.title = title;
         this.color = color;
     }
+
+
 }
