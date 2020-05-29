@@ -51,7 +51,7 @@ registerLocaleData(localeRu);
         StatCardComponent,
         PrioritiesComponent,
         SettingsDialogComponent,
-        EditPriorityDialogComponent
+        EditPriorityDialogComponent,
     ],
     imports: [
         BrowserModule,
