@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {DataHandlerService} from "../../service/data-handler.service";
 import {Task} from 'src/app/model/Task';
-import {MatTableDataSource} from "@angular/material";
+import { MatTableDataSource } from "@angular/material/table";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {EditTaskDialogComponent} from "../../dialog/edit-task-dialog/edit-task-dialog.component";
@@ -19,8 +19,8 @@ import {OperType} from "../../dialog/OperType";
 export class TasksComponent implements OnInit {
 
     // ссылки на компоненты таблицы
-    @ViewChild(MatPaginator, {static: false}) private paginator: MatPaginator;
-    @ViewChild(MatSort, {static: false}) private sort: MatSort;
+    @ViewChild(MatPaginator) private paginator: MatPaginator;
+    @ViewChild(MatSort) private sort: MatSort;
 
 
     @Output()

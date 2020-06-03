@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {MatDialogRef} from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 import {DataHandlerService} from '../../service/data-handler.service';
 import {Priority} from '../../model/Priority';
 
