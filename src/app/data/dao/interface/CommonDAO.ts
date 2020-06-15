@@ -1,4 +1,4 @@
-// стандартные методы CRUD (create, read, udpate, delete)
+// стандартные методы CRUD (create, read, update, delete)
 
 import {Observable} from 'rxjs';
 
@@ -6,18 +6,17 @@ import {Observable} from 'rxjs';
 export interface CommonDAO<T> {
 
     // получить все значения
-    getAll(): Observable<T[]>;
+    findAll(): Observable<T[]>;
 
     // получить одно значение по id
-    get(id: number): Observable<T>; // получение значения по уникальному id
+    findById(id: number): Observable<T>; // получение значения по уникальному id
 
     // обновить значение
-    update(T): Observable<T>;
+    update(obj: T): Observable<T>;
 
     // удалить значение
     delete(id: number): Observable<T>; // удаление по id
 
     // добавить значение
-    add(T): Observable<T>;
-
+    add(obj: T): Observable<T>;
 }
