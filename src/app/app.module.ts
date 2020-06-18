@@ -4,9 +4,9 @@ import {NgModule} from '@angular/core';
 import {AppComponent} from './app.component';
 import {CategoriesComponent} from './views/categories/categories.component';
 import {TasksComponent} from "./views/tasks/tasks.component";
-import { MatPaginatorModule } from "@angular/material/paginator";
-import { MatSortModule } from "@angular/material/sort";
-import { MatTableModule } from "@angular/material/table";
+import {MatPaginatorModule} from "@angular/material/paginator";
+import {MatSortModule} from "@angular/material/sort";
+import {MatTableModule} from "@angular/material/table";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {EditTaskDialogComponent} from './dialog/edit-task-dialog/edit-task-dialog.component';
 import {MatDialogModule} from "@angular/material/dialog";
@@ -35,6 +35,10 @@ import {SettingsDialogComponent} from "./dialog/settings-dialog/settings-dialog.
 import {ColorPickerModule} from "ngx-color-picker";
 import {EditPriorityDialogComponent} from "./dialog/edit-priority-dialog/edit-priority-dialog.component";
 import {HttpClientModule} from "@angular/common/http";
+import {TASK_URL_TOKEN} from './data/dao/impl/TaskService';
+import {CATEGORY_URL_TOKEN} from "./data/dao/impl/CategoryService";
+import {PRIORITY_URL_TOKEN} from "./data/dao/impl/PriorityService";
+import {STAT_URL_TOKEN} from "./data/dao/impl/StatService";
 
 registerLocaleData(localeRu);
 
@@ -76,7 +80,25 @@ registerLocaleData(localeRu);
         ColorPickerModule,
         HttpClientModule
     ],
-    providers: [],
+    providers: [
+
+        {
+            provide: TASK_URL_TOKEN,
+            useValue: 'http://loclahost:8080/task'
+        },
+        {
+            provide: CATEGORY_URL_TOKEN,
+            useValue: 'http://loclahost:8080/category'
+        },
+        {
+            provide: PRIORITY_URL_TOKEN,
+            useValue: 'http://loclahost:8080/priority'
+        },
+        {
+            provide: STAT_URL_TOKEN,
+            useValue: 'http://loclahost:8080/stat'
+        }
+    ],
     entryComponents: [
         EditTaskDialogComponent,
         ConfirmDialogComponent,

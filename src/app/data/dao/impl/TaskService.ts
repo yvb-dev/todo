@@ -1,9 +1,12 @@
-import {Injectable} from '@angular/core';
+import {Inject, Injectable, InjectionToken} from '@angular/core';
 import {TaskDAO} from "../interface/TaskDAO";
 import {Task} from "../../../model/Task";
 import {Observable} from "rxjs";
 import {TaskSearchValues} from "../search/SearchObjects";
 import {HttpClient} from "@angular/common/http";
+import {CommonService} from "./CommonService";
+
+export const TASK_URL_TOKEN = new InjectionToken<string>('url');
 
 @Injectable({
     providedIn: 'root'
@@ -11,34 +14,14 @@ import {HttpClient} from "@angular/common/http";
 
 //JSON формируется автоматически на response and request
 
-export class TaskService implements TaskDAO {
+export class TaskService extends CommonService<Task> implements TaskDAO {
 
-    url = 'http://loclahost:8080/task';
 
-    constructor(private httpClient: HttpClient) {
-    }
-
-    add(t: Task): Observable<Task> {
-        return this.httpClient.post<Task>(this.url + '/add', t);
-    }
-
-    delete(id: number): Observable<Task> {
-        return this.httpClient.get<Task>(this.url + '/delete/' + id);
+    constructor(@Inject(TASK_URL_TOKEN) private baseUrl, private http: HttpClient) {
+        super(baseUrl, http);
     }
 
     findTasks(taskSearchValues: TaskSearchValues): Observable<any> {
-        return this.httpClient.post<Task[]>(this.url + '/search', taskSearchValues);
-    }
-
-    findById(id: number): Observable<Task> {
-        return this.httpClient.get<Task>(this.url + '/id/' + id);
-    }
-
-    findAll(): Observable<Task[]> {
-        return this.httpClient.get<Task[]>(this.url + '/all');
-    }
-
-    update(t: Task): Observable<Task> {
-        return this.httpClient.post<Task>(this.url + '/update', t);
+        return this.http.post<Task[]>(this.baseUrl + '/search', taskSearchValues);
     }
 }

@@ -1,9 +1,12 @@
-import {Injectable} from '@angular/core';
+import {Inject, Injectable, InjectionToken} from '@angular/core';
 import {Priority} from "../../../model/Priority";
 import {Observable} from "rxjs";
 import {PrioritySearchValues} from "../search/SearchObjects";
 import {HttpClient} from "@angular/common/http";
 import {PriorityDAO} from "../interface/PriorityDAO";
+import {CommonService} from "./CommonService";
+
+export const PRIORITY_URL_TOKEN = new InjectionToken<string>('url');
 
 @Injectable({
     providedIn: 'root'
@@ -11,34 +14,13 @@ import {PriorityDAO} from "../interface/PriorityDAO";
 
 //JSON формируется автоматически на response and request
 
-export class PriorityService implements PriorityDAO {
+export class PriorityService extends CommonService<Priority> implements PriorityDAO {
 
-    url = 'http://loclahost:8080/priority';
-
-    constructor(private httpClient: HttpClient) {
-    }
-
-    add(t: Priority): Observable<Priority> {
-        return this.httpClient.post<Priority>(this.url + '/add', t);
-    }
-
-    delete(id: number): Observable<Priority> {
-        return this.httpClient.get<Priority>(this.url + '/delete/' + id);
+    constructor(@Inject(PRIORITY_URL_TOKEN) private baseUrl, private http: HttpClient) {
+        super(baseUrl, http);
     }
 
     findPriorities(prioritySearchValues: PrioritySearchValues): Observable<any> {
-        return this.httpClient.post<Priority[]>(this.url + '/search', prioritySearchValues);
-    }
-
-    findById(id: number): Observable<Priority> {
-        return this.httpClient.get<Priority>(this.url + '/id/' + id);
-    }
-
-    findAll(): Observable<Priority[]> {
-        return this.httpClient.get<Priority[]>(this.url + '/all');
-    }
-
-    update(t: Priority): Observable<Priority> {
-        return this.httpClient.post<Priority>(this.url + '/update', t);
+        return this.http.post<Priority[]>(this.baseUrl + '/search', prioritySearchValues);
     }
 }

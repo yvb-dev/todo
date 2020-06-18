@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {DataHandlerService} from "../../service/data-handler.service";
 import {Task} from 'src/app/model/Task';
 import { MatTableDataSource } from "@angular/material/table";
 import {MatPaginator} from "@angular/material/paginator";
@@ -80,7 +79,6 @@ export class TasksComponent implements OnInit {
 
 
     constructor(
-        private dataHandler: DataHandlerService, // доступ к данным
         private dialog: MatDialog, // работа с диалоговым окном
 
     ) {
