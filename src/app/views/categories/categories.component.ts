@@ -1,8 +1,9 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Category} from "../../model/Category";
 import {EditCategoryDialogComponent} from "../../dialog/edit-category-dialog/edit-category-dialog.component";
-import {MatDialog} from "@angular/material/dialog";
-import {OperType} from "../../dialog/OperType";
+import {MatDialog, MatDialogActions} from "@angular/material/dialog";
+import {DialogAction} from "../../object/DialogResult";
+import {CategorySearchValues} from "../../data/dao/search/SearchObjects";
 
 @Component({
     selector: 'app-categories',
@@ -11,62 +12,45 @@ import {OperType} from "../../dialog/OperType";
 })
 export class CategoriesComponent implements OnInit {
 
+    filterTitle: string; // текущее значение для поиска категорий
+    filterChanged: boolean;
+    indexMouseMove: number;  // для отображения иконки редактирования при наведении на категорию
+
     @Input()
     categories: Category[];
-
     @Input()
     selectedCategory: Category;
-
-    // категории с кол-вом активных задач для каждой из них
-    @Input('categoryMap')
-    set setCategoryMap(categoryMap: Map<Category, number>) {
-        this.selectedCategoryMap = categoryMap;
-    }
-
-    // кол-во невыполненных задач всего
     @Input()
-    uncompletedTotal: number;
+    categorySearchValues: CategorySearchValues
+    ues;
+    // поиск категории
 
-
-    // выбрали категорию из списка
     @Output()
-    selectCategory = new EventEmitter<Category>();
-
+    searchCategory = new EventEmitter<CategorySearchValues>(); // передаем CategorySearchValues для поиска
     // удалили категорию
     @Output()
     deleteCategory = new EventEmitter<Category>();
-
     // изменили категорию
     @Output()
     updateCategory = new EventEmitter<Category>();
-
     // добавили категорию
     @Output()
-    addCategory = new EventEmitter<string>(); // передаем только название новой категории
-
-    // поиск категории
-    @Output()
-    searchCategory = new EventEmitter<string>(); // передаем строку для поиска
+    addCategory = new EventEmitter<Category>(); // передаем только название новой категории
 
 
-    // для отображения иконки редактирования при наведении на категорию
-    private indexMouseMove: number;
-    private searchCategoryTitle: string; // текущее значение для поиска категорий
-
-    private selectedCategoryMap: Map<Category, number>; // список всех категорий и кол-во активных задач
+    // кол-во невыполненных задач всего
+    @Input()
+    uncompletedCountForCategoryAll: number;
 
 
     constructor(
-        private dialog: MatDialog, // внедряем MatDialog, чтобы работать с диалоговыми окнами
-
+        private dialog: MatDialog // внедряем MatDialog, чтобы работать с диалоговыми окнами
     ) {
     }
 
     // метод вызывается автоматически после инициализации компонента
     ngOnInit() {
-        // this.dataHandler.getAllCategories().subscribe(categories => this.categories = categories);
     }
-
 
     private showTasksByCategory(category: Category): void {
 
@@ -78,7 +62,7 @@ export class CategoriesComponent implements OnInit {
         this.selectedCategory = category; // сохраняем выбранную категорию
 
         // вызываем внешний обработчик и передаем туда выбранную категорию
-        this.selectCategory.emit(this.selectedCategory);
+        // this.selectCategory.emit(this.selectedCategory);
     }
 
     // сохраняет индекс записи категории, над который в данный момент проходит мышка (и там отображается иконка редактирования)
@@ -90,54 +74,58 @@ export class CategoriesComponent implements OnInit {
     // диалоговое окно для редактирования категории
     private openEditDialog(category: Category): void {
         const dialogRef = this.dialog.open(EditCategoryDialogComponent, {
-            data: [category.title, 'Редактирование категории', OperType.EDIT],
+            data: [new Category(category.id, category.title), 'Редактирование категории'],
             width: '400px'
         });
-
         dialogRef.afterClosed().subscribe(result => {
-
-            if (result === 'delete') { // нажали удалить
-
-                this.deleteCategory.emit(category); // вызываем внешний обработчик
-
-                return;
+            if (!result) {
+                return
             }
-
-            if (result as string) { // нажали сохранить
-                category.title = result as string;
-
-                this.updateCategory.emit(category); // вызываем внешний обработчик
-                return;
+            if (result.action === DialogAction.DELETE) {
+                this.deleteCategory.emit(category); // вызываем внешний обработчик
+            }
+            if (result.action === DialogAction.SAVE) {
+                this.updateCategory.emit(result.obj as Category); // вызываем внешний обработчик
             }
         });
     }
 
     // диалоговое окно для добавления категории
     private openAddDialog(): void {
-
         const dialogRef = this.dialog.open(EditCategoryDialogComponent, {
-            data: ['', 'Добавление категории', OperType.ADD],
+            data: [new Category(null, ''), 'Добавление категории'],
             width: '400px'
         });
-
         dialogRef.afterClosed().subscribe(result => {
-            if (result) {
-                this.addCategory.emit(result as string); // вызываем внешний обработчик
+            if (!result) {
+                return
+            }
+            if (result.action === DialogAction.SAVE) {
+                this.addCategory.emit(result.obj as Category); // вызываем внешний обработчик
             }
         });
     }
 
     // поиск категории
     private search(): void {
-
-
-        if (this.searchCategoryTitle == null) {
+        this.filterChanged = false;
+        if (!this.categorySearchValues) {
             return;
         }
-
-        this.searchCategory.emit(this.searchCategoryTitle);
-
+        this.categorySearchValues.title = this.filterTitle;
+        this.searchCategory.emit(this.categorySearchValues)
     }
 
+    checkFilterChanged() {
+        this.filterChanged = false;
+        if (this.filterTitle !== this.categorySearchValues.title) {
+            this.filterChanged = true;
+        }
+        return this.filterChanged;
+    }
 
+    clearAndSearch() {
+        this.filterTitle = null;
+        this.search()
+    }
 }

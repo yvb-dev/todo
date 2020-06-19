@@ -10,20 +10,20 @@
         <input
             #inputTitle
 
-            (keydown.enter)="onConfirm()" [(ngModel)]="categoryTitle"
+            matInput maxlength="15"
 
-            matInput
-            maxlength="15"
+            [(ngModel)]="category.title"
+            (keydown.enter)="confirm()"
 
         />
 
         <button
-                *ngIf="categoryTitle.trim().length > 0"
+                *ngIf="category.title.trim().length > 0"
 
-                aria-label="Clear"
-                class="clear-icon size25" mat-button mat-icon-button matSuffix
+                class="clear-icon"
+                mat-button matSuffix mat-icon-button aria-label="Clear"
 
-                (click)="categoryTitle= ''"
+                (click)="category.title= ''"
 
         >
             <mat-icon>clear</mat-icon>
@@ -38,14 +38,14 @@
     <div class="col-12 text-center">
 
         <button
-                (click)="onConfirm()" [disabled]="inputTitle.value.trim().length==0"
-                color="primary"
-                mat-raised-button
+                mat-raised-button color="primary"
+                (click)="confirm()"
+                [disabled]="inputTitle.value.trim().length==0"
         >
             Сохранить
         </button>
 
-        <button (click)="onCancel()" mat-raised-button>Отмена</button>
+        <button mat-raised-button (click)="cancel()">Отмена</button>
 
     </div>
 
@@ -54,9 +54,9 @@
 
 
         <button
-                *ngIf="canDelete()"
-                (click)="delete()"
-                class="red" mat-button>
+                *ngIf="canDelete"
+                mat-button
+                (click)="delete()" class="red">
 
             Удалить
 

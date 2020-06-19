@@ -18,7 +18,7 @@ export class CommonService<T> {
     }
 
     delete(id: number): Observable<T> {
-        return this.httpClient.get<T>(this.url + '/delete/' + id);
+        return this.httpClient.delete<T>(this.url + '/delete/' + id);
     }
 
     findById(id: number): Observable<T> {
@@ -30,6 +30,6 @@ export class CommonService<T> {
     }
 
     update(t: T): Observable<T> {
-        return this.httpClient.post<T>(this.url + '/update', t);
+        return this.httpClient.put<T>(this.url + '/update', t);
     }
 }

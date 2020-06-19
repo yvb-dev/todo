@@ -2,9 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {Task} from './model/Task';
 import {Category} from "./model/Category";
 import {Priority} from "./model/Priority";
-import {zip} from "rxjs";
-import {concatMap, map} from "rxjs/operators";
 import {IntroService} from "./service/intro.service";
+import {CategoryService} from "./data/dao/impl/CategoryService";
+import {CategorySearchValues} from "./data/dao/search/SearchObjects";
 
 @Component({
     selector: 'app-root',
@@ -13,148 +13,70 @@ import {IntroService} from "./service/intro.service";
 })
 export class AppComponent implements OnInit {
 
-    // коллекция категорий с кол-вом незавершенных задач для каждой из них
-    private categoryMap = new Map<Category, number>();
-
-    private tasks: Task[];
-    private categories: Category[]; // все категории
-    private priorities: Priority[]; // все приоритеты
-
-    // статистика
-    private totalTasksCountInCategory: number;
-    private completedCountInCategory: number;
-    private uncompletedCountInCategory: number;
-    private uncompletedTotalTasksCount: number;
-
-    // показать/скрыть статистику
-    private showStat = true;
-
-    // выбранная категория
-    private selectedCategory: Category = null;
-
-    // поиск
-    private searchTaskText = ''; // текущее значение для поиска задач
-    private searchCategoryText = ''; // текущее значение для поиска категорий
-
-
-    // фильтрация
-    private priorityFilter: Priority;
-    private statusFilter: boolean;
-
+    categories: Category[];     // все категории
+    uncompletedCountForCategoryAll: number;
+    showStat = true;     // показать/скрыть статистику
+    selectedCategory: Category = null;     // выбранная категория
+    categorySearchValues = new CategorySearchValues(); // параметры поисков // экземпляр можно создать тут же, т.к. не загружаем из cookies
 
     constructor(
+        private  categoryService: CategoryService,
         private introService: IntroService
     ) {
     }
 
     ngOnInit() {
-        // this.dataHandler.getAllPriorities().subscribe(priorities => this.priorities = priorities);
-        // this.dataHandler.getAllCategories().subscribe(categories => this.categories = categories);
-
-        // заполнить меню с категориями
-        this.fillCategories();
-
-        this.onSelectCategory(null); // показать все задачи
-
-        this.introService.startIntroJS(true);
+        this.fillAllCategories();
     }
-
-
-    // добавление категории
-    private onAddCategory(title: string): void {
-        // this.dataHandler.addCategory(title).subscribe(() => this.fillCategories());
-    }
-
-    // private fillCategories(): void {
-    //     this.dataHandler.getAllCategories().subscribe(categories => this.categories = categories);
-    // }
 
     // заполняет категории и кол-во невыполненных задач по каждой из них (нужно для отображения категорий)
-    private fillCategories() {
-
-        if (this.categoryMap) {
-            this.categoryMap.clear();
-        }
-
-        this.categories = this.categories.sort((a, b) => a.title.localeCompare(b.title));
-
-        // для каждой категории посчитать кол-во невыполненных задач
-
-        this.categories.forEach(cat => {
-            // this.dataHandler.getUncompletedCountInCategory(cat).subscribe(count => this.categoryMap.set(cat, count));
-        });
-
+    private fillAllCategories() {
+        this.categoryService.findAll().subscribe(result => {
+            this.categories = result;
+        })
     }
 
     // поиск категории
-    private onSearchCategory(title: string): void {
-
-        this.searchCategoryText = title;
-        //
-        // this.dataHandler.searchCategories(title).subscribe(categories => {
-        //     this.categories = categories;
-		// 	this.fillCategories();
-        // });
+    private searchCategory(categorySearchValues: CategorySearchValues): void {
+        this.categoryService.findCategories(categorySearchValues).subscribe(result => {
+            this.categories = result;
+        })
     }
 
-
-    // изменение категории
-    private onSelectCategory(category: Category): void {
-
-        this.selectedCategory = category;
-
-        this.updateTasksAndStat();
-
+    // добавление категории
+    private addCategory(category: Category): void {
+        this.categoryService.add(category).subscribe(result => {
+            this.searchCategory(this.categorySearchValues);
+        })
     }
-
-    // // удаление категории
-    // private onDeleteCategory(category: Category): void {
-    //     this.dataHandler.deleteCategory(category.id).subscribe(cat => {
-    //         this.selectedCategory = null; // открываем категорию "Все"
-    //         this.onSelectCategory(null);
-    //     });
-    // }
 
     // удаление категории
-    private onDeleteCategory(category: Category) {
-        // this.dataHandler.deleteCategory(category.id).subscribe(cat => {
-        //     this.selectedCategory = null; // открываем категорию "Все"
-        //     this.categoryMap.delete(cat); // не забыть удалить категорию из карты
-        //     this.onSearchCategory(this.searchCategoryText);
-        //     this.updateTasks();
-        // });
+    private deleteCategory(category: Category) {
+        this.categoryService.delete(category.id).subscribe(result => {
+            this.searchCategory(this.categorySearchValues);
+        })
     }
 
     // обновлении категории
-    private onUpdateCategory(category: Category): void {
-        // this.dataHandler.updateCategory(category).subscribe(() => {
-        //     this.onSearchCategory(this.searchCategoryText);
-        // });
+    private updateCategory(category: Category): void {
+        this.categoryService.update(category).subscribe(result => {
+            this.searchCategory(this.categorySearchValues);
+        })
     }
+
+    // изменение категории
+    private selectCategory(category: Category): void {
+        // this.selectedCategory = category;
+        // this.updateTasksAndStat();
+    }
+
 
     // обновление задачи
     private onUpdateTask(task: Task): void {
-
-        // this.dataHandler.updateTask(task).subscribe(() => {
-        //
-        //     this.fillCategories();
-        //
-        //     this.updateTasksAndStat();
-        // });
-
     }
 
-    // // удаление задачи
-    // private onDeleteTask(task: Task): void {
-    //
-    //     this.dataHandler.deleteTask(task.id).subscribe(cat => {
-    //         this.updateTasksAndStat();
-    //     });
-    // }
-
-    // удаление задачи
+// удаление задачи
     private onDeleteTask(task: Task) {
-
         // this.dataHandler.deleteTask(task.id).pipe(
         //     concatMap(task => {
         //             return this.dataHandler.getUncompletedCountInCategory(task.category).pipe(map(count => {
@@ -164,37 +86,35 @@ export class AppComponent implements OnInit {
         //     )).subscribe(result => {
         //
         //     const t = result.t as Task;
-		//
-		// 	// если указана категория - обновляем счетчик для соотв. категории
+        //
+        // 	// если указана категория - обновляем счетчик для соотв. категории
         //     // чтобы не обновлять весь список - обновим точечно
         //     if (t.category) {
         //         this.categoryMap.set(t.category, result.count);
         //     }
-		//
+        //
         //     this.updateTasksAndStat();
         //
         // });
-
-
     }
 
 
-    // поиск задач
+// поиск задач
     private onSearchTasks(searchString: string): void {
-        this.searchTaskText = searchString;
-        this.updateTasks();
+        // this.searchTaskText = searchString;
+        // this.updateTasks();
     }
 
-    // фильтрация задач по статусу (все, решенные, нерешенные)
+// фильтрация задач по статусу (все, решенные, нерешенные)
     private onFilterTasksByStatus(status: boolean): void {
-        this.statusFilter = status;
-        this.updateTasks();
+        // this.statusFilter = status;
+        // this.updateTasks();
     }
 
-    // фильтрация задач по приоритету
+// фильтрация задач по приоритету
     private onFilterTasksByPriority(priority: Priority): void {
-        this.priorityFilter = priority;
-        this.updateTasks();
+        // this.priorityFilter = priority;
+        // this.updateTasks();
     }
 
     private updateTasks(): void {
@@ -208,22 +128,8 @@ export class AppComponent implements OnInit {
         // });
     }
 
-
-    // // добавление задачи
-    // private onAddTask(task: Task): void {
-    //
-    //     this.dataHandler.addTask(task).subscribe(result => {
-    //
-    //         this.updateTasksAndStat();
-    //
-    //     });
-    //
-    // }
-
-    // добавление задачи
+// добавление задачи
     private onAddTask(task: Task) {
-
-
         // this.dataHandler.addTask(task).pipe(// сначала добавляем задачу
         //     concatMap(task => { // используем добавленный task (concatMap - для последовательного выполнения)
         //         // .. и считаем кол-во задач в категории с учетом добавленной задачи
@@ -244,22 +150,18 @@ export class AppComponent implements OnInit {
         //     this.updateTasksAndStat();
         //
         // });
-
     }
 
 
-
-    // показывает задачи с применением всех текущий условий (категория, поиск, фильтры и пр.)
+// показывает задачи с применением всех текущий условий (категория, поиск, фильтры и пр.)
     private updateTasksAndStat(): void {
-
-        this.updateTasks(); // обновить список задач
-
-        // обновить переменные для статистики
-        this.updateStat();
-
+        // this.updateTasks(); // обновить список задач
+        //
+        // // обновить переменные для статистики
+        // this.updateStat();
     }
 
-    // обновить статистику
+// обновить статистику
     private updateStat(): void {
         // zip(
         //     this.dataHandler.getTotalCountInCategory(this.selectedCategory),
@@ -275,11 +177,8 @@ export class AppComponent implements OnInit {
         //     });
     }
 
-    // показать-скрыть статистику
+// показать-скрыть статистику
     private toggleStat(showStat: boolean): void {
-        this.showStat = showStat;
+        // this.showStat = showStat;
     }
-
-
-
 }

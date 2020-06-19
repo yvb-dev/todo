@@ -84,19 +84,19 @@ registerLocaleData(localeRu);
 
         {
             provide: TASK_URL_TOKEN,
-            useValue: 'http://loclahost:8080/task'
+            useValue: 'http://localhost:8080/task'
         },
         {
             provide: CATEGORY_URL_TOKEN,
-            useValue: 'http://loclahost:8080/category'
+            useValue: 'http://localhost:8080/category'
         },
         {
             provide: PRIORITY_URL_TOKEN,
-            useValue: 'http://loclahost:8080/priority'
+            useValue: 'http://localhost:8080/priority'
         },
         {
             provide: STAT_URL_TOKEN,
-            useValue: 'http://loclahost:8080/stat'
+            useValue: 'http://localhost:8080/stat'
         }
     ],
     entryComponents: [
