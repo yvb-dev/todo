@@ -4,7 +4,9 @@ import {Category} from "./model/Category";
 import {Priority} from "./model/Priority";
 import {IntroService} from "./service/intro.service";
 import {CategoryService} from "./data/dao/impl/CategoryService";
-import {CategorySearchValues} from "./data/dao/search/SearchObjects";
+import {CategorySearchValues, TaskSearchValues} from "./data/dao/search/SearchObjects";
+import {TaskService} from "./data/dao/impl/TaskService";
+import {PageEvent} from "@angular/material/paginator";
 
 @Component({
     selector: 'app-root',
@@ -14,13 +16,17 @@ import {CategorySearchValues} from "./data/dao/search/SearchObjects";
 export class AppComponent implements OnInit {
 
     categories: Category[];     // все категории
+    tasks: Task[];
     uncompletedCountForCategoryAll: number;
     showStat = true;     // показать/скрыть статистику
     selectedCategory: Category = null;     // выбранная категория
     categorySearchValues = new CategorySearchValues(); // параметры поисков // экземпляр можно создать тут же, т.к. не загружаем из cookies
+    taskSearchValues = new TaskSearchValues(); // параметры поисков // экземпляр можно создать тут же, т.к. не загружаем из cookies
+    totalTasksFounded: number;
 
     constructor(
         private  categoryService: CategoryService,
+        private  taskService: TaskService,
         private introService: IntroService
     ) {
     }
@@ -66,8 +72,10 @@ export class AppComponent implements OnInit {
 
     // изменение категории
     private selectCategory(category: Category): void {
-        // this.selectedCategory = category;
-        // this.updateTasksAndStat();
+
+        this.selectedCategory = category;
+        this.taskSearchValues.categoryId = category ? category.id : null;
+        this.searchTasks(this.taskSearchValues);
     }
 
 
@@ -180,5 +188,28 @@ export class AppComponent implements OnInit {
 // показать-скрыть статистику
     private toggleStat(showStat: boolean): void {
         // this.showStat = showStat;
+    }
+
+    private searchTasks(taskSearchValues: TaskSearchValues) {
+        this.taskSearchValues = taskSearchValues;
+        this.taskService.findTasks(this.taskSearchValues).subscribe(result => {
+            this.totalTasksFounded = result.totalElements;
+            this.tasks = result.content;
+        });
+    }
+
+    paging(pageEvent: PageEvent) {
+        // если изменили настройку "кол-во на странице" - заново делаем запрос и показываем с 1й страницы
+        if (this.taskSearchValues.pageSize !== pageEvent.pageSize) {
+            this.taskSearchValues.pageNumber = 0; // новые данные будем показывать с 1-й страницы (индекс 0)
+        } else {
+            // если просто перешли на другую страницу
+            this.taskSearchValues.pageNumber = pageEvent.pageIndex;
+        }
+
+        this.taskSearchValues.pageSize = pageEvent.pageSize;
+        this.taskSearchValues.pageNumber = pageEvent.pageIndex;
+
+        this.searchTasks(this.taskSearchValues); // показываем новые данные
     }
 }

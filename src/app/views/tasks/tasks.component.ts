@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Task} from 'src/app/model/Task';
 import { MatTableDataSource } from "@angular/material/table";
-import {MatPaginator} from "@angular/material/paginator";
+import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {EditTaskDialogComponent} from "../../dialog/edit-task-dialog/edit-task-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
@@ -9,6 +9,7 @@ import {ConfirmDialogComponent} from "../../dialog/confirm-dialog/confirm-dialog
 import {Category} from "../../model/Category";
 import {Priority} from "../../model/Priority";
 import {OperType} from "../../dialog/OperType";
+import {TaskSearchValues} from "../../data/dao/search/SearchObjects";
 
 @Component({
     selector: 'app-tasks',
@@ -17,9 +18,13 @@ import {OperType} from "../../dialog/OperType";
 })
 export class TasksComponent implements OnInit {
 
+    taskSearchValues: TaskSearchValues;
+
     // ссылки на компоненты таблицы
-    @ViewChild(MatPaginator) private paginator: MatPaginator;
-    @ViewChild(MatSort) private sort: MatSort;
+    @ViewChild(MatPaginator)
+    paginator: MatPaginator;
+    @ViewChild(MatSort)
+    sort: MatSort;
 
 
     @Output()
@@ -43,12 +48,23 @@ export class TasksComponent implements OnInit {
     @Output()
     addTask = new EventEmitter<Task>();
 
+    @Output()
+    paging = new EventEmitter<PageEvent>();
+
+    @Input()
+    totalTasksFounded: number;
+
+    @Input('taskSearchValues')
+    private set setTaskSearchValues(taskSearchValues: TaskSearchValues){
+        this.taskSearchValues = taskSearchValues;
+    }
 
     // текущие задачи для отображения на странице
     @Input('tasks')
     private set setTasks(tasks: Task[]) { // напрямую не присваиваем значения в переменную, только через @Input
         this.tasks = tasks;
-        this.fillTable();
+        this.assignTableSource();
+        // this.fillTable();
     }
 
     @Input('priorities')
@@ -69,13 +85,11 @@ export class TasksComponent implements OnInit {
     private selectedPriorityFilter: Priority = null;   // по-умолчанию будут показываться задачи по всем приоритетам
 
 
-
     // поля для таблицы (те, что отображают данные из задачи - должны совпадать с названиями переменных класса)
     private displayedColumns: string[] = ['color', 'id', 'title', 'date', 'priority', 'category', 'operations', 'select'];
 
     private priorities: Priority[]; // список приоритетов (для фильтрации задач)
     private tasks: Task[];
-
 
 
     constructor(
@@ -85,16 +99,10 @@ export class TasksComponent implements OnInit {
     }
 
     ngOnInit() {
-
-        // this.dataHandler.getAllTasks().subscribe(tasks => this.tasks = tasks);
-
         // датасорс обязательно нужно создавать для таблицы, в него присваивается любой источник (БД, массивы, JSON и пр.)
         this.dataSource = new MatTableDataSource();
-
         this.onSelectCategory(null);
-
     }
-
 
 
     // в зависимости от статуса задачи - вернуть цвет названия
@@ -240,7 +248,7 @@ export class TasksComponent implements OnInit {
 
 
     // фильтрация по приоритету
-    private onFilterByPriority(value: Priority): void{
+    private onFilterByPriority(value: Priority): void {
 
         // на всякий случай проверяем изменилось ли значение (хотя сам UI компонент должен это делать)
         if (value !== this.selectedPriorityFilter) {
@@ -250,6 +258,7 @@ export class TasksComponent implements OnInit {
     }
 
     // диалоговое окно для добавления задачи
+
     private openAddTaskDialog(): void {
 
         // то же самое, что и при редактировании, но только передаем пустой объект Task
@@ -266,4 +275,14 @@ export class TasksComponent implements OnInit {
     }
 
 
+    private assignTableSource() {
+        if (!this.dataSource) {
+            return;
+        }
+        this.dataSource.data = this.tasks; // обновить источник данных (т.к. данные массива tasks обновились)
+    }
+
+    pageChanged(pageEvent: PageEvent) {
+        this.paging.emit(pageEvent)
+    }
 }

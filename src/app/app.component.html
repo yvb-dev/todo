@@ -12,6 +12,7 @@
                 (deleteCategory)="deleteCategory($event)"
                 (searchCategory)="searchCategory($event)"
                 (updateCategory)="updateCategory($event)"
+                (selectCategory)="selectCategory($event)"
 
                 [categories]="categories"
                 [selectedCategory]="selectedCategory"
@@ -51,27 +52,16 @@
                     <!--                    ></app-stat>-->
                 </div>
                 <div class="row">
-
-
                     <div class="col-12">
 
-                        <!--                        <app-tasks-->
-                        <!--                                (updateTask)="onUpdateTask($event)"-->
-                        <!--                                (deleteTask)="onDeleteTask($event)"-->
-                        <!--                                (selectCategory)="onSelectCategory($event)"-->
-                        <!--                                (addTask)="onAddTask($event)"-->
-
-
-                        <!--                                [selectedCategory]="selectedCategory"-->
-                        <!--                                (filterByTitle)="onSearchTasks($event)"-->
-                        <!--                                (filterByPriority)="onFilterTasksByPriority($event)"-->
-                        <!--                                (filterByStatus)="onFilterTasksByStatus($event)"-->
-
-                        <!--                                [tasks]="tasks"-->
-                        <!--                                [priorities]="priorities"-->
-
-
-                        <!--                        ></app-tasks>-->
+                        <app-tasks
+                                [totalTasksFounded]="totalTasksFounded"
+                                [tasks]="tasks"
+                                [taskSearchValues]="taskSearchValues"
+                                (paging)="paging($event)"
+                                [selectedCategory]="selectedCategory"
+                                (selectCategory)="selectCategory($event)">
+                        </app-tasks>
                     </div>
                 </div>
             </div>

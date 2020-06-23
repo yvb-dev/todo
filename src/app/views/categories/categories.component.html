@@ -55,8 +55,9 @@
             </div>
 
             <!-- виртуальная категория 'Все'-->
-            <li (click)="showTasksByCategory(null)" [class.active]="selectedCategory === null"
-                class="nav-item category">
+            <li [class.active]="selectedCategory === null"
+                class="nav-item category"
+                (click)="showCategory(null)">
                 <a class="nav-link pointer">
                     <!--          название категории-->
                     <span class="all-category-title">Все</span>
@@ -68,9 +69,10 @@
             <div class="line"></div>
             <div *ngIf="categories && categories.length === 0"><p class="not-found">Ничего не найдено</p></div>
             <li
-                    (click)="showTasksByCategory(category)" (mouseenter)="showEditIcon(index)"
-                    (mouseleave)="showEditIcon(null)"
                     *ngFor="let category of categories; let index = index"
+                    (click)="showCategory(category)"
+                    (mouseenter)="showEditIcon(index)"
+                    (mouseleave)="showEditIcon(null)"
                     [class.active]="category === selectedCategory"
                     class="nav-item pointer"
             >

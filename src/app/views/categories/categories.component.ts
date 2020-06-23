@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Category} from "../../model/Category";
 import {EditCategoryDialogComponent} from "../../dialog/edit-category-dialog/edit-category-dialog.component";
-import {MatDialog, MatDialogActions} from "@angular/material/dialog";
+import {MatDialog} from "@angular/material/dialog";
 import {DialogAction} from "../../object/DialogResult";
 import {CategorySearchValues} from "../../data/dao/search/SearchObjects";
 
@@ -22,9 +22,10 @@ export class CategoriesComponent implements OnInit {
     selectedCategory: Category;
     @Input()
     categorySearchValues: CategorySearchValues
-    ues;
-    // поиск категории
+    @Input()
+    uncompletedCountForCategoryAll: number; // кол-во невыполненных задач всего
 
+    // поиск категории
     @Output()
     searchCategory = new EventEmitter<CategorySearchValues>(); // передаем CategorySearchValues для поиска
     // удалили категорию
@@ -36,23 +37,19 @@ export class CategoriesComponent implements OnInit {
     // добавили категорию
     @Output()
     addCategory = new EventEmitter<Category>(); // передаем только название новой категории
+    @Output()
+    selectCategory = new EventEmitter<Category>();
 
 
-    // кол-во невыполненных задач всего
-    @Input()
-    uncompletedCountForCategoryAll: number;
-
-
-    constructor(
-        private dialog: MatDialog // внедряем MatDialog, чтобы работать с диалоговыми окнами
-    ) {
+    constructor(private dialog: MatDialog) // внедряем MatDialog, чтобы работать с диалоговыми окнами
+    {
     }
 
     // метод вызывается автоматически после инициализации компонента
     ngOnInit() {
     }
 
-    private showTasksByCategory(category: Category): void {
+    private showCategory(category: Category): void {
 
         // если не изменилось значение, ничего не делать (чтобы лишний раз не делать запрос данных)
         if (this.selectedCategory === category) {
@@ -62,7 +59,7 @@ export class CategoriesComponent implements OnInit {
         this.selectedCategory = category; // сохраняем выбранную категорию
 
         // вызываем внешний обработчик и передаем туда выбранную категорию
-        // this.selectCategory.emit(this.selectedCategory);
+        this.selectCategory.emit(this.selectedCategory);
     }
 
     // сохраняет индекс записи категории, над который в данный момент проходит мышка (и там отображается иконка редактирования)
