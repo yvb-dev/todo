@@ -4,9 +4,10 @@ import {Category} from "./model/Category";
 import {Priority} from "./model/Priority";
 import {IntroService} from "./service/intro.service";
 import {CategoryService} from "./data/dao/impl/CategoryService";
-import {CategorySearchValues, TaskSearchValues} from "./data/dao/search/SearchObjects";
+import {CategorySearchValues, PrioritySearchValues, TaskSearchValues} from "./data/dao/search/SearchObjects";
 import {TaskService} from "./data/dao/impl/TaskService";
 import {PageEvent} from "@angular/material/paginator";
+import {PriorityService} from "./data/dao/impl/PriorityService";
 
 @Component({
     selector: 'app-root',
@@ -15,30 +16,44 @@ import {PageEvent} from "@angular/material/paginator";
 })
 export class AppComponent implements OnInit {
 
-    categories: Category[];     // все категории
-    tasks: Task[];
-    uncompletedCountForCategoryAll: number;
     showStat = true;     // показать/скрыть статистику
-    selectedCategory: Category = null;     // выбранная категория
+
+    categories: Category[];
+    tasks: Task[];
+    priorities: Priority[];
+
     categorySearchValues = new CategorySearchValues(); // параметры поисков // экземпляр можно создать тут же, т.к. не загружаем из cookies
     taskSearchValues = new TaskSearchValues(); // параметры поисков // экземпляр можно создать тут же, т.к. не загружаем из cookies
+    prioritySearchValues = new PrioritySearchValues();
+
+    selectedCategory: Category = null;     // выбранная категория
+    uncompletedCountForCategoryAll: number;
     totalTasksFounded: number;
+    showSearch: boolean;
 
     constructor(
         private  categoryService: CategoryService,
         private  taskService: TaskService,
+        private  priorityService: PriorityService,
         private introService: IntroService
     ) {
     }
 
     ngOnInit() {
         this.fillAllCategories();
+        this.fillAllPriorities();
     }
 
     // заполняет категории и кол-во невыполненных задач по каждой из них (нужно для отображения категорий)
     private fillAllCategories() {
         this.categoryService.findAll().subscribe(result => {
             this.categories = result;
+        })
+    }
+
+    private fillAllPriorities() {
+        this.priorityService.findAll().subscribe(result => {
+            this.priorities = result;
         })
     }
 
@@ -72,10 +87,47 @@ export class AppComponent implements OnInit {
 
     // изменение категории
     private selectCategory(category: Category): void {
-
         this.selectedCategory = category;
         this.taskSearchValues.categoryId = category ? category.id : null;
         this.searchTasks(this.taskSearchValues);
+    }
+
+    private searchTasks(taskSearchValues: TaskSearchValues) {
+        this.taskSearchValues = taskSearchValues;
+
+        this.taskService.findTasks(this.taskSearchValues).subscribe(result => {
+
+            // Если выбранная страница для отображения больше, чем всего страниц - заново делаем поиск и показываем 1ю страницу.
+            // Если пользователь был например на 2й странице общего списка и выполнил новый поиск, в результате которого доступна только 1 страница,
+            // то нужно вызвать поиск заново с показом 1й страницы (индекс 0)
+            if (result.totalPages > 0 && this.taskSearchValues.pageNumber >= result.totalPages) {
+                this.taskSearchValues.pageNumber = 0;
+                this.searchTasks(this.taskSearchValues);
+            }
+
+            this.totalTasksFounded = result.totalElements; // сколько данных показывать на странице
+            this.tasks = result.content; // массив задач
+        });
+    }
+
+    paging(pageEvent: PageEvent) {
+        // если изменили настройку "кол-во на странице" - заново делаем запрос и показываем с 1й страницы
+        if (this.taskSearchValues.pageSize !== pageEvent.pageSize) {
+            this.taskSearchValues.pageNumber = 0; // новые данные будем показывать с 1-й страницы (индекс 0)
+        } else {
+            // если просто перешли на другую страницу
+            this.taskSearchValues.pageNumber = pageEvent.pageIndex;
+        }
+
+        this.taskSearchValues.pageSize = pageEvent.pageSize;
+        this.taskSearchValues.pageNumber = pageEvent.pageIndex;
+
+        this.searchTasks(this.taskSearchValues); // показываем новые данные
+    }
+
+
+    toggleSearch(showSearch: boolean) {
+        this.showSearch = showSearch;
     }
 
 
@@ -190,26 +242,4 @@ export class AppComponent implements OnInit {
         // this.showStat = showStat;
     }
 
-    private searchTasks(taskSearchValues: TaskSearchValues) {
-        this.taskSearchValues = taskSearchValues;
-        this.taskService.findTasks(this.taskSearchValues).subscribe(result => {
-            this.totalTasksFounded = result.totalElements;
-            this.tasks = result.content;
-        });
-    }
-
-    paging(pageEvent: PageEvent) {
-        // если изменили настройку "кол-во на странице" - заново делаем запрос и показываем с 1й страницы
-        if (this.taskSearchValues.pageSize !== pageEvent.pageSize) {
-            this.taskSearchValues.pageNumber = 0; // новые данные будем показывать с 1-й страницы (индекс 0)
-        } else {
-            // если просто перешли на другую страницу
-            this.taskSearchValues.pageNumber = pageEvent.pageIndex;
-        }
-
-        this.taskSearchValues.pageSize = pageEvent.pageSize;
-        this.taskSearchValues.pageNumber = pageEvent.pageIndex;
-
-        this.searchTasks(this.taskSearchValues); // показываем новые данные
-    }
 }

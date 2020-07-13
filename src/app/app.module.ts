@@ -39,6 +39,7 @@ import {TASK_URL_TOKEN} from './data/dao/impl/TaskService';
 import {CATEGORY_URL_TOKEN} from "./data/dao/impl/CategoryService";
 import {PRIORITY_URL_TOKEN} from "./data/dao/impl/PriorityService";
 import {STAT_URL_TOKEN} from "./data/dao/impl/StatService";
+import {DeviceDetectorModule} from "ngx-device-detector";
 
 registerLocaleData(localeRu);
 
@@ -78,7 +79,8 @@ registerLocaleData(localeRu);
         MatNativeDateModule,
         MatCheckboxModule,
         ColorPickerModule,
-        HttpClientModule
+        HttpClientModule,
+        DeviceDetectorModule.forRoot()
     ],
     providers: [
 

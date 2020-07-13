@@ -1,14 +1,11 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {Task} from 'src/app/model/Task';
-import { MatTableDataSource } from "@angular/material/table";
-import {MatPaginator, PageEvent} from "@angular/material/paginator";
-import {MatSort} from "@angular/material/sort";
-import {EditTaskDialogComponent} from "../../dialog/edit-task-dialog/edit-task-dialog.component";
-import {MatDialog} from "@angular/material/dialog";
-import {ConfirmDialogComponent} from "../../dialog/confirm-dialog/confirm-dialog.component";
-import {Category} from "../../model/Category";
-import {Priority} from "../../model/Priority";
-import {OperType} from "../../dialog/OperType";
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Task} from '../../model/Task';
+import {Category} from '../../model/Category';
+import {DeviceDetectorService} from 'ngx-device-detector';
+import {Priority} from '../../model/Priority';
+import {MatDialog} from '@angular/material/dialog';
+import {PageEvent} from '@angular/material/paginator';
+import {MatTableDataSource} from '@angular/material/table';
 import {TaskSearchValues} from "../../data/dao/search/SearchObjects";
 
 @Component({
@@ -16,273 +13,298 @@ import {TaskSearchValues} from "../../data/dao/search/SearchObjects";
     templateUrl: './tasks.component.html',
     styleUrls: ['./tasks.component.css']
 })
+
+// "presentational component": отображает полученные данные и отправляет какие-либо действия обработчику
+// назначение - работа со списком задач
 export class TasksComponent implements OnInit {
 
-    taskSearchValues: TaskSearchValues;
-
-    // ссылки на компоненты таблицы
-    @ViewChild(MatPaginator)
-    paginator: MatPaginator;
-    @ViewChild(MatSort)
-    sort: MatSort;
+    // ----------------------- входящие параметры ----------------------------
 
 
-    @Output()
-    deleteTask = new EventEmitter<Task>();
+    // переменные для настройки постраничности должны быть проинициализированы первыми (до обновления tasks)
+    // чтобы компонент постраничности правильно отработал
 
-    @Output()
-    selectCategory = new EventEmitter<Category>(); // нажали на категорию из списка задач
-
-    @Output()
-    updateTask = new EventEmitter<Task>();
-
-    @Output()
-    filterByTitle = new EventEmitter<string>();
-
-    @Output()
-    filterByStatus = new EventEmitter<boolean>();
-
-    @Output()
-    filterByPriority = new EventEmitter<Priority>();
-
-    @Output()
-    addTask = new EventEmitter<Task>();
-
-    @Output()
-    paging = new EventEmitter<PageEvent>();
 
     @Input()
-    totalTasksFounded: number;
+    totalTasksFounded: number; // сколько всего задач найдено
 
-    @Input('taskSearchValues')
-    private set setTaskSearchValues(taskSearchValues: TaskSearchValues){
-        this.taskSearchValues = taskSearchValues;
-    }
+    @Input()
+    selectedCategory: Category;
 
-    // текущие задачи для отображения на странице
+    @Input()
+    showSearch: boolean; // показать/скрыть инструменты поиска
+
+    // задачи для отображения на странице
     @Input('tasks')
-    private set setTasks(tasks: Task[]) { // напрямую не присваиваем значения в переменную, только через @Input
+    set setTasks(tasks: Task[]) {
         this.tasks = tasks;
-        this.assignTableSource();
-        // this.fillTable();
+        this.assignTableSource();   // передать данные таблице для отображения задач
     }
 
+    // приоритеты для фильтрации и выбора при редактировании/создании задачи (выпадающий список)
     @Input('priorities')
     set setPriorities(priorities: Priority[]) {
         this.priorities = priorities;
     }
 
-    @Input()
-    selectedCategory: Category;
+
+    // все возможные параметры для поиска задач
+    @Input('taskSearchValues')
+    set setTaskSearchValues(taskSearchValues: TaskSearchValues) {
+        this.taskSearchValues = taskSearchValues;
+        this.initSearchValues(); // записать в локальные переменные
+        this.initSortDirectionIcon(); // показать правильную иконку (убывание, возрастание)
+    }
 
 
-    private dataSource: MatTableDataSource<Task>; // контейнер - источник данных для таблицы
+
+    // ----------------------- исходящие действия----------------------------
+
+    @Output()
+    addTask = new EventEmitter<Task>();
+
+    @Output()
+    deleteTask = new EventEmitter<Task>();
+
+    @Output()
+    updateTask = new EventEmitter<Task>();
+
+    @Output()
+    selectCategory = new EventEmitter<Category>(); // нажали на категорию из списка задач
+
+    @Output()
+    paging = new EventEmitter<PageEvent>(); // переход по страницам данных
+
+    @Output()
+    searchAction = new EventEmitter<TaskSearchValues>(); // переход по страницам данных
+
+    @Output()
+    toggleSearch = new EventEmitter<boolean>(); // показать/скрыть поиск
+
+    // -------------------------------------------------------------------------
 
 
-    // поиск
-    private searchTaskText: string; // текущее значение для поиска задач
-    private selectedStatusFilter: boolean = null;   // по-умолчанию будут показываться задачи по всем статусам (решенные и нерешенные)
-    private selectedPriorityFilter: Priority = null;   // по-умолчанию будут показываться задачи по всем приоритетам
-
+    priorities: Priority[]; // список приоритетов (для фильтрации задач, для выпадающих списков)
+    tasks: Task[]; // текущий список задач для отображения
 
     // поля для таблицы (те, что отображают данные из задачи - должны совпадать с названиями переменных класса)
-    private displayedColumns: string[] = ['color', 'id', 'title', 'date', 'priority', 'category', 'operations', 'select'];
+    displayedColumns: string[] = ['color', 'id', 'title', 'date', 'priority', 'category', 'operations', 'select'];
+    dataSource: MatTableDataSource<Task> = new MatTableDataSource<Task>(); // источник данных для таблицы
 
-    private priorities: Priority[]; // список приоритетов (для фильтрации задач)
-    private tasks: Task[];
+    changed = false;
+
+
+    readonly defaultSortColumn = 'title';
+    readonly defaultSortDirection = 'asc';
+
+
+    // значения для поиска (локальные переменные)
+    filterTitle: string;
+    filterCompleted: number;
+    filterPriorityId: number;
+    filterSortColumn: string;
+    filterSortDirection: string;
+
+
+    isMobile: boolean; // мобильное ли устройство
+
+    // параметры поиска задач - первоначально данные загружаются из cookies (в app.component)
+    taskSearchValues: TaskSearchValues;
+
+    sortIconName: string; // иконка сортировки (убывание, возрастание)
+
+    // названия иконок из коллекции
+    readonly iconNameDown = 'arrow_downward';
+    readonly iconNameUp = 'arrow_upward';
+
+    // цвета
+    readonly colorCompletedTask = '#F8F9FA';
+    readonly colorWhite = '#fff';
 
 
     constructor(
         private dialog: MatDialog, // работа с диалоговым окном
-
+        private deviceService: DeviceDetectorService // для определения типа устройства
     ) {
+        this.isMobile = this.deviceService.isMobile();
     }
+
 
     ngOnInit() {
+    }
+
+
+    // передать данные таблице для отображения задач
+    assignTableSource() {
+
         // датасорс обязательно нужно создавать для таблицы, в него присваивается любой источник (БД, массивы, JSON и пр.)
-        this.dataSource = new MatTableDataSource();
-        this.onSelectCategory(null);
-    }
-
-
-    // в зависимости от статуса задачи - вернуть цвет названия
-    private getPriorityColor(task: Task): string {
-
-        // цвет завершенной задачи
-        if (task.completed) {
-            return '#F8F9FA'; // TODO вынести цвета в константы (magic strings, magic numbers)
-        }
-
-        if (task.priority && task.priority.color) {
-            return task.priority.color;
-        }
-
-        return '#fff'; // TODO вынести цвета в константы (magic strings, magic numbers)
-
-    }
-
-    // показывает задачи с применением всех текущий условий (категория, поиск, фильтры и пр.)
-    private fillTable(): void {
-
-
         if (!this.dataSource) {
             return;
         }
-
         this.dataSource.data = this.tasks; // обновить источник данных (т.к. данные массива tasks обновились)
-
-        this.addTableObjects();
-
-
-        // когда получаем новые данные..
-        // чтобы можно было сортировать по столбцам "категория" и "приоритет", т.к. там не примитивные типы, а объекты
-        // @ts-ignore - показывает ошибку для типа даты, но так работает, т.к. можно возвращать любой тип
-        this.dataSource.sortingDataAccessor = (task, colName) => {
-
-            // по каким полям выполнять сортировку для каждого столбца
-            switch (colName) {
-                case 'priority': {
-                    return task.priority ? task.priority.id : null;
-                }
-                case 'category': {
-                    return task.category ? task.category.title : null;
-                }
-                case 'date': {
-                    return task.date ? task.date : null;
-                }
-
-                case 'title': {
-                    return task.title;
-                }
-            }
-        };
-
 
     }
 
-    private addTableObjects(): void {
-        this.dataSource.sort = this.sort; // компонент для сортировки данных (если необходимо)
-        this.dataSource.paginator = this.paginator; // обновить компонент постраничности (кол-во записей, страниц)
+    // диалоговое окно для добавления задачи
+    openAddDialog() {
+
+
+
     }
 
     // диалоговое редактирования для добавления задачи
-    private openEditTaskDialog(task: Task): void {
-
-        // открытие диалогового окна
-        const dialogRef = this.dialog.open(EditTaskDialogComponent, {
-            data: [task, 'Редактирование задачи', OperType.EDIT],
-            autoFocus: false
-        });
-
-        dialogRef.afterClosed().subscribe(result => {
-            // обработка результатов
-
-            if (result === 'complete') {
-                task.completed = true; // ставим статус задачи как выполненная
-                this.updateTask.emit(task);
-            }
+    openEditDialog(task: Task): void {
 
 
-            if (result === 'activate') {
-                task.completed = false; // возвращаем статус задачи как невыполненная
-                this.updateTask.emit(task);
-                return;
-            }
 
-            if (result === 'delete') {
-                this.deleteTask.emit(task);
-                return;
-            }
-
-            if (result as Task) { // если нажали ОК и есть результат
-                this.updateTask.emit(task);
-                return;
-            }
-
-        });
     }
 
 
     // диалоговое окно подтверждения удаления
-    private openDeleteDialog(task: Task): void {
-        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-            maxWidth: '500px',
-            data: {
-                dialogTitle: 'Подтвердите действие',
-                message: `Вы действительно хотите удалить задачу: "${task.title}"?`
-            },
-            autoFocus: false
-        });
+    openDeleteDialog(task: Task) {
 
-        dialogRef.afterClosed().subscribe(result => {
-            if (result) { // если нажали ОК
-                this.deleteTask.emit(task);
-            }
-        });
-    }
-
-    private onToggleStatus(task: Task): void {
-        task.completed = !task.completed;
-        this.updateTask.emit(task);
     }
 
 
-    private onSelectCategory(category: Category): void {
-        this.selectCategory.emit(category);
+    // нажали/отжали выполнение задачи
+    onToggleCompleted(task: Task) {
+
+
     }
 
-    // фильтрация по названию
-    private onFilterByTitle(): void {
-        this.filterByTitle.emit(this.searchTaskText);
+
+    // в зависимости от статуса задачи - вернуть цвет
+    getPriorityColor(task: Task) {
+
+        // если задача завершена - возвращаем цвет
+        if (task.completed) {
+            return this.colorCompletedTask;
+        }
+
+        // вернуть цвет приоритета, если он указан
+        if (task.priority && task.priority.color) {
+            return task.priority.color;
+        }
+
+        return this.colorWhite;
+
     }
 
-    // фильтрация по статусу
-    private onFilterByStatus(value: boolean): void {
+    // в зависимости от статуса задачи - вернуть фоновый цвет
+    getPriorityBgColor(task: Task) {
 
-        // на всякий случай проверяем изменилось ли значение (хотя сам UI компонент должен это делать)
-        if (value !== this.selectedStatusFilter) {
-            this.selectedStatusFilter = value;
-            this.filterByStatus.emit(this.selectedStatusFilter);
+        if (task.priority != null && !task.completed) {
+            return task.priority.color;
+        }
+
+        return 'none';
+    }
+
+
+// в это событие попадает как переход на другую страницу (pageIndex), так и изменение кол-ва данных на страниц (pageSize)
+    pageChanged(pageEvent: PageEvent) {
+        this.paging.emit(pageEvent);
+    }
+
+
+    // параметры поиска
+    initSearch() {
+
+        // сохраняем значения перед поиском
+        this.taskSearchValues.title = this.filterTitle;
+        this.taskSearchValues.completed = this.filterCompleted;
+        this.taskSearchValues.priorityId = this.filterPriorityId;
+        this.taskSearchValues.sortColumn = this.filterSortColumn;
+        this.taskSearchValues.sortDirection = this.filterSortDirection;
+
+        this.searchAction.emit(this.taskSearchValues);
+
+        this.changed = false; // сбрасываем флаг изменения
+
+    }
+
+
+    // проверяет, были ли изменены какие-либо параметры поиска (по сравнению со старым значением)
+    checkFilterChanged() {
+
+        this.changed = false;
+
+        // поочередно проверяем все фильтры (текущее введенное значение с последним сохраненным)
+        if (this.taskSearchValues.title !== this.filterTitle) {
+            this.changed = true;
+        }
+
+        if (this.taskSearchValues.completed !== this.filterCompleted) {
+            this.changed = true;
+        }
+
+        if (this.taskSearchValues.priorityId !== this.filterPriorityId) {
+            this.changed = true;
+        }
+
+        if (this.taskSearchValues.sortColumn !== this.filterSortColumn) {
+            this.changed = true;
+        }
+
+        if (this.taskSearchValues.sortDirection !== this.filterSortDirection) {
+            this.changed = true;
+        }
+
+        return this.changed;
+
+    }
+
+
+
+    // выбрать правильную иконку (убывание, возрастание)
+    initSortDirectionIcon() {
+
+        if (this.filterSortDirection === 'desc') {
+            this.sortIconName = this.iconNameDown;
+        } else {
+            this.sortIconName = this.iconNameUp;
         }
     }
 
 
-    // фильтрация по приоритету
-    private onFilterByPriority(value: Priority): void {
+    // изменили направление сортировки
+    changedSortDirection() {
 
-        // на всякий случай проверяем изменилось ли значение (хотя сам UI компонент должен это делать)
-        if (value !== this.selectedPriorityFilter) {
-            this.selectedPriorityFilter = value;
-            this.filterByPriority.emit(this.selectedPriorityFilter);
+        if (this.filterSortDirection === 'asc') {
+            this.filterSortDirection = 'desc';
+        } else {
+            this.filterSortDirection = 'asc';
         }
-    }
 
-    // диалоговое окно для добавления задачи
-
-    private openAddTaskDialog(): void {
-
-        // то же самое, что и при редактировании, но только передаем пустой объект Task
-        const task = new Task(null, '', false, null, this.selectedCategory);
-
-        const dialogRef = this.dialog.open(EditTaskDialogComponent, {data: [task, 'Добавление задачи', OperType.ADD]});
-
-        dialogRef.afterClosed().subscribe(result => {
-            if (result) { // если нажали ОК и есть результат
-                this.addTask.emit(task);
-            }
-        });
+        this.initSortDirectionIcon(); // применяем правильную иконку
 
     }
 
-
-    private assignTableSource() {
-        if (!this.dataSource) {
+    // проинициализировать локальные переменные поиска
+    initSearchValues() {
+        if (!this.taskSearchValues) {
             return;
         }
-        this.dataSource.data = this.tasks; // обновить источник данных (т.к. данные массива tasks обновились)
+        this.filterTitle = this.taskSearchValues.title;
+        this.filterCompleted = this.taskSearchValues.completed;
+        this.filterPriorityId = this.taskSearchValues.priorityId;
+        this.filterSortColumn = this.taskSearchValues.sortColumn;
+        this.filterSortDirection = this.taskSearchValues.sortDirection;
     }
 
-    pageChanged(pageEvent: PageEvent) {
-        this.paging.emit(pageEvent)
+    // сбросить локальные переменные поиска
+    clearSearchValues() {
+        this.filterTitle = '';
+        this.filterCompleted = null;
+        this.filterPriorityId = null;
+        this.filterSortColumn = this.defaultSortColumn;
+        this.filterSortDirection = this.defaultSortDirection;
     }
+
+    // показать/скрыть инструменты поиска
+    onToggleSearch() {
+        this.toggleSearch.emit(!this.showSearch);
+    }
+
+
 }
