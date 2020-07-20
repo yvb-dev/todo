@@ -24,32 +24,26 @@
     <div class="main-panel">
 
         <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
-
             <!--    навигация с шапкой и списком категорий-->
+                        <app-header
+                                (toggleStat)="toggleStat($event)"
+                                [categoryName]="selectedCategory ? selectedCategory.title: 'Все'"
+                                [showStat]="showStat"
 
-            <!--            <app-header-->
-            <!--                    (toggleStat)="toggleStat($event)"-->
-            <!--                    [categoryName]="selectedCategory ? selectedCategory.title: 'Все'"-->
-            <!--                    [showStat]="showStat"-->
-
-            <!--            ></app-header>-->
-
+                        ></app-header>
         </nav>
 
         <div class="content">
             <div class="container-fluid">
-
                 <div
                         date-step="2"
                         data-position="top"
                         data-intro="Список всех задач со статистикой">
-                    <!-- статистика -->
-                    <!--                    <app-stat-->
-                    <!--                            [completeTasksInCategory]="completedCountInCategory"-->
-                    <!--                            [showStat]="showStat"-->
-                    <!--                            [totalTasksInCategory]="totalTasksCountInCategory"-->
-                    <!--                            [uncompleteTasksInCategory]="uncompletedCountInCategory"-->
-                    <!--                    ></app-stat>-->
+                    <!--                     статистика-->
+                    <app-stat
+                            [dash]="dash"
+                            [showStat]="showStat">
+                    </app-stat>
                 </div>
                 <div class="row">
                     <div class="col-12">
@@ -80,4 +74,5 @@
         <app-footer></app-footer>
 
     </div>
+
 </div>
