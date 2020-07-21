@@ -40,6 +40,7 @@ import {CATEGORY_URL_TOKEN} from "./data/dao/impl/CategoryService";
 import {PRIORITY_URL_TOKEN} from "./data/dao/impl/PriorityService";
 import {STAT_URL_TOKEN} from "./data/dao/impl/StatService";
 import {DeviceDetectorModule} from "ngx-device-detector";
+import {SidebarModule} from "ng-sidebar";
 
 registerLocaleData(localeRu);
 
@@ -79,6 +80,7 @@ registerLocaleData(localeRu);
         MatNativeDateModule,
         MatCheckboxModule,
         ColorPickerModule,
+        SidebarModule,
         HttpClientModule,
         DeviceDetectorModule.forRoot()
     ],

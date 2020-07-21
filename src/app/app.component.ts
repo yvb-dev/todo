@@ -315,6 +315,13 @@ export class AppComponent implements OnInit {
         const tmpCategory = this.categories.find(t => t.id === id);
         return this.categories.indexOf(tmpCategory);
     }
+
+    // были ли изменены настройки приложения
+    settingsChanged(priorities: Priority[]) {
+        // this.fillAllPriorities(); // заново загрузить все категории из БД (чтобы их можно было сразу использовать в задачах)
+        this.priorities = priorities; // получаем измененные массив с приоритетами
+        this.searchTasks(this.taskSearchValues); // обновить текущие задачи и категории для отображения
+    }
 }
 
 

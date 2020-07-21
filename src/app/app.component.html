@@ -1,78 +1,135 @@
-<div class="wrapper ">
 
-    <div
-            class="sidebar"
-            data-color="purple"
-            data-step="1"
-            data-intro="Фильтрация задач, добавление/удаление/редактирование категорий"
-            data-position='right'
+<ng-sidebar-container style="height: 100vh"> <!--контейнер для внедрения слайд-меню-->
+
+    <!--  слайд-меню-->
+    <ng-sidebar
+
+
+            [opened]="menuOpened"
+            [closeOnClickOutside]="false"
+            [closeOnClickBackdrop]="true"
+            [showBackdrop]="showBackdrop"
+            [mode]="menuMode"
+            [animate]="true"
+            [position]="menuPosition"
+            [autoFocus]="false"
+
+
+            (onClosed)="onClosedMenu()"
+
+
     >
-        <app-categories
-                (addCategory)="addCategory($event)"
-                (deleteCategory)="deleteCategory($event)"
-                (searchCategory)="searchCategory($event)"
-                (updateCategory)="updateCategory($event)"
-                (selectCategory)="selectCategory($event)"
 
-                [categories]="categories"
-                [selectedCategory]="selectedCategory"
-                [uncompletedCountForCategoryAll]="uncompletedCountForCategoryAll"
-                [categorySearchValues]="categorySearchValues">
-        </app-categories>
-    </div>
 
-    <div class="main-panel">
+        <div class="sidebar"
+             data-color="purple"
+             data-step="1"
+             data-intro="Фильтрация задач, добавление/удаление/редактирование категорий"
+             data-position='right'
+        >
 
-        <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
-            <!--    навигация с шапкой и списком категорий-->
-                        <app-header
-                                (toggleStat)="toggleStat($event)"
-                                [categoryName]="selectedCategory ? selectedCategory.title: 'Все'"
-                                [showStat]="showStat"
+            <!--    список категорий-->
+            <app-categories
 
-                        ></app-header>
-        </nav>
+                    (selectCategory)="selectCategory($event)"
+                    (addCategory)="addCategory($event)"
+                    (deleteCategory)="deleteCategory($event)"
+                    (updateCategory)="updateCategory($event)"
+                    (searchCategory)="searchCategory($event)"
 
-        <div class="content">
-            <div class="container-fluid">
-                <div
-                        date-step="2"
-                        data-position="top"
-                        data-intro="Список всех задач со статистикой">
-                    <!--                     статистика-->
-                    <app-stat
-                            [dash]="dash"
-                            [showStat]="showStat">
-                    </app-stat>
-                </div>
-                <div class="row">
-                    <div class="col-12">
 
-                        <app-tasks
-                                [showSearch]="showSearch"
-                                [totalTasksFounded]="totalTasksFounded"
-                                [tasks]="tasks"
-                                [priorities]="priorities"
-                                [categories]="categories"
-                                [selectedCategory]="selectedCategory"
-                                [taskSearchValues]="taskSearchValues"
+                    [selectedCategory]="selectedCategory"
+                    [categories]="categories"
+                    [uncompletedCountForCategoryAll]="uncompletedCountForCategoryAll"
+                    [categorySearchValues]="categorySearchValues"
 
-                                (searchAction)="searchTasks($event)"
-                                (toggleSearch)="toggleSearch($event)"
-                                (selectCategory)="selectCategory($event)"
-                                (paging)="paging($event)"
-                                (addTask)="addTask($event)"
-                                (deleteTask)="deleteTask($event)"
-                                (updateTask)="updateTask($event)">
-                        </app-tasks>
+            ></app-categories>
 
-                    </div>
-                </div>
-            </div>
         </div>
 
-        <app-footer></app-footer>
+    </ng-sidebar>
+
+
+    <!--  основной контент-->
+    <!--  ng-sidebar-content - над чем будет открываться слайд-меню-->
+    <div ng-sidebar-content>
+        <div class="main-panel wrapper">
+
+
+            <!--    навигация с шапкой и списком категорий-->
+
+            <nav class="navbar navbar-transparent navbar-absolute fixed-top navbar-expand">
+
+                <!--     шапка с меню -->
+                <app-header
+                        [categoryName]="selectedCategory ? selectedCategory.title: 'Все'"
+                        [showStat]="showStat"
+
+                        (toggleStat)="toggleStat($event)"
+                        (toggleMenu)="toggleMenu()"
+                        (settingsChanged)="settingsChanged($event)"
+
+                >
+
+                </app-header>
+
+
+            </nav>
+
+
+            <div class="content">
+                <div class="container-fluid">
+
+
+                    <!-- статистика -->
+                    <app-stat
+
+                            [dash]="dash"
+                            [showStat]="showStat"
+                    >
+
+                    </app-stat>
+
+
+                    <!--        список задач-->
+                    <app-tasks
+
+                            [showSearch]="showSearch"
+                            [totalTasksFounded]="totalTasksFounded"
+                            [tasks]="tasks"
+                            [priorities]="priorities"
+                            [categories]="categories"
+                            [selectedCategory]="selectedCategory"
+                            [taskSearchValues]="taskSearchValues"
+
+
+                            (searchAction)="searchTasks($event)"
+                            (selectCategory)="selectCategory($event)"
+                            (addTask)="addTask($event)"
+                            (deleteTask)="deleteTask($event)"
+                            (updateTask)="updateTask($event)"
+                            (paging)="paging($event)"
+                            (toggleSearch)="toggleSearch($event)"
+
+
+                    >
+
+
+                    </app-tasks>
+
+
+                </div>
+            </div>
+
+
+            <!--    нижняя часть страницы (футер, подвал) -->
+            <app-footer *ngIf="!isMobile"></app-footer>
+
+
+        </div>
+
 
     </div>
 
-</div>
+
+</ng-sidebar-container>
